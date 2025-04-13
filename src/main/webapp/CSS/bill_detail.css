@@ -1,0 +1,107 @@
+/* Đặt kiểu cho toàn bộ trang */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+/* Container */
+.container {
+    width: 80%;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+}
+
+/* Thông tin khách hàng */
+.customer-info {
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: #555;
+}
+
+.customer-info strong {
+    color: #333;
+}
+
+/* Bảng sách */
+.book-list {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.book-list th, .book-list td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.book-list th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+.book-list tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.book-list tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Nút quay lại */
+.btn-back {
+    display: inline-block;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.btn-back:hover {
+    background-color: #0056b3;
+}
+
+@media print {
+    /* Ẩn header */
+    .navbar {
+        display: none;
+    }
+
+    /* Ẩn nút in */
+    .btn-print {
+        display: none;
+    }
+
+    /* Ẩn các phần không cần thiết khác nếu có */
+    .container .btn-back {
+        display: none;
+    }
+}
+
+/* Nút In */
+.btn-print {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+.btn-print:hover {
+    background-color: #45a049;
+}

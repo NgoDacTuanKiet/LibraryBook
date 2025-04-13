@@ -1,0 +1,31 @@
+.search-container, .info-container {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin: 20px 0;
+    background: #f9f9f9;
+}
+.search-box, .info-box {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.search-box input {
+    padding: 5px;
+    flex: 1;
+}
+.search-container .btn {
+    margin-bottom: auto;
+}
+
+.category-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}

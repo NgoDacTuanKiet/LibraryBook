@@ -1,0 +1,33 @@
+.footer {
+    background: url('/khac/tmp.jpg') no-repeat center center/cover;
+    color: white;
+    padding: 20px;
+    text-align: left;
+    position: relative;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.text-box {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 15px;
+    border-radius: 8px;
+    max-width: 400px;
+}
+
+.text-box p {
+    margin: 5px 0;
+}
+
+.text-box a {
+    color: #ffcc00;
+    text-decoration: none;
+}
+
+.text-box a:hover {
+    text-decoration: underline;
+}

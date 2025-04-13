@@ -1,0 +1,129 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+h1 {
+    text-align: left;
+}
+.container {
+    width: 80%;
+    margin: auto;
+    text-align: center;
+}
+.box {
+    display: flex; 
+    justify-content: space-between; /* Đẩy hai phần tử về hai bên */
+    align-items: center;
+    width: 100%;
+    padding: 10px 20px;
+}
+.book-list {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+}
+.book {
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+.book:hover {
+    background-color: lightgray;
+    transform: scale(1.05);
+    transition: 0.3s;
+}
+.book img {
+    width: 150px;
+    height: 200px;
+    object-fit: cover;
+}
+.pages {
+    margin-top: 50px;
+}
+.pages a {
+    padding: 10px;
+    margin: 5px;
+    text-decoration: none;
+    background-color: #b3e5fc;
+    color: black;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+.search-container {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin: 30px auto;
+    background: #fdfdfd;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 1200px;
+}
+
+.search-box {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.input-row input {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.category-row label {
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.checkbox-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checkbox-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 150px;
+}
+
+.btn {
+    margin-top: 20px;
+    padding: 10px 25px;
+    background-color: #007B33;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    align-self: flex-end;
+}
+
+.btn:hover {
+    background-color: #005c24;
+}

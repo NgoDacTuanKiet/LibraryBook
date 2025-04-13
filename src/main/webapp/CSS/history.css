@@ -1,0 +1,26 @@
+/* history */
+.status-container {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    display: flex;
+    gap: 20px;
+}
+
+.status {
+    font-size: 28px;
+    font-weight: normal;
+}
+
+.status.active {
+    font-weight: bold;
+}
+
+.status:hover {
+    text-decoration: none;
+    transform: scale(1.05); /* Phóng to nhẹ */
+    transition: 0.3s;
+}
+a {
+    color: black; /* Đổi màu chữ thành đen */
+    text-decoration: none; /* Bỏ gạch chân */
+}
