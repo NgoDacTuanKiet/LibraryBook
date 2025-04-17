@@ -60,6 +60,8 @@
                                     "<td>" + book.publisher + "</td>" +
                                     "<td>" + book.yearOfpublication + "</td>" +
                                     "<td>" + categories + "</td>" +
+                                    "<td>" + book.quantity + "</td>" +
+                                    "<td>" + book.availableQuantity + "</td>" +
                                     "<td class='actions'>" +
                                         "<a href='edit?id=" + book.id + "'><img src='/khac/pencil-icon.png' alt='Sửa'></a>" +
                                         "<img src='/khac/delete.png' alt='Xóa' onclick='deleteBook(" + book.id + ")'>" +
@@ -145,11 +147,18 @@
     <div class="container">
         <div class="sidebar">
             <a href="/admin/account/list">Quản lý khách hàng</a>
-            <a href="/admin/employee/list">Quản lý nhân viên</a>
+            
+            <% if ("ADMIN".equals(session.getAttribute("role"))) { %>
+                <a href="/admin/employee/list">Quản lý nhân viên</a>
+                <a href="/admin/category/edit">Quản lý thể loại</a>
+            <% }else { %>
+            <% } %>
+            
             <a href="/admin/book/list">Quản lý sách</a>
-            <a href="/admin/category/edit">Quản lý thể loại</a>
             <a href="/admin/rental/list">Quản lý thuê sách</a>
+            <a href="/admin/invoice/list">Hóa đơn</a>
         </div>
+        
         <div class="content">
             <h2>Tìm kiếm sách</h2>
             <div class="search-container">
@@ -179,8 +188,8 @@
                         <th>Nhà xuất bản</th>
                         <th>Năm xuất bản</th>
                         <th>Thể loại</th>
-                        <!-- <th>Số lượng</th>
-                        <th>Có sẵn</th> -->
+                        <th>Số lượng</th>
+                        <th>Có sẵn</th>
                         <th style="min-width: 120px;">Thao tác</th>
                     </tr>
                 </thead>

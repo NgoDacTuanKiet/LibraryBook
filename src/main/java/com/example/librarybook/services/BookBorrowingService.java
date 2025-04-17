@@ -12,11 +12,19 @@ public class BookBorrowingService {
     private BookBorrowingRepository bookBorrowedRepository;
 
     public BookBorrowing findByBookIdAndCustomerId(Long bookId,Long customerId){
-        BookBorrowing  bookBorrowed = bookBorrowedRepository.findByBook_IdAndCustomer_Id(bookId, customerId);
-        if (bookBorrowed == null){
-            bookBorrowed = new BookBorrowing();
-            bookBorrowed.setQuantity(0L);
+        BookBorrowing  bookBorrowing = bookBorrowedRepository.findByBook_IdAndCustomer_Id(bookId, customerId);
+        if (bookBorrowing == null){
+            bookBorrowing = new BookBorrowing();
+            bookBorrowing.setQuantity(0L);
         }
-        return bookBorrowed;
+        return bookBorrowing;
+    }
+
+    public BookBorrowing save(BookBorrowing bookBorrowing){
+        return bookBorrowedRepository.save(bookBorrowing);
+    }
+
+    public void deleteById(Long id){
+        bookBorrowedRepository.deleteById(id);
     }
 }

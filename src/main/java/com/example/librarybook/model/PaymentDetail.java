@@ -2,6 +2,8 @@ package com.example.librarybook.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,6 +37,7 @@ public class PaymentDetail {
     @Column(name = "reason")
     private String reason;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "paymentID")
     private Payment payment;

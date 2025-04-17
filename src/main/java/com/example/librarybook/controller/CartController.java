@@ -79,7 +79,7 @@ public class CartController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<CartDetail>> getCart(HttpSession session) {
+    public ResponseEntity<List<CartDetail>> getCartDetails(HttpSession session) {
         User tmp = (User) session.getAttribute("user");
         if (tmp == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);

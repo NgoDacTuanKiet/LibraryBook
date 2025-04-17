@@ -100,7 +100,7 @@
         </ul>
     </nav>
 
-    <div class="container">
+    <div class="content">
         <h2>Chi Tiết Hóa Đơn</h2>
 
         <div class="customer-info">

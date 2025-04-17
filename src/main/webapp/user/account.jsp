@@ -26,7 +26,7 @@
                             alert("Bạn chưa đăng nhập!");
                             window.location.href = "/signin"; // Chuyển hướng đến trang đăng nhập
                         } else {
-                            $(".avatar").attr("src", user.imageUrl || "/khac/logo.webp");
+                            $(".avatar").attr("src", user.imageUrl || "/khac/avatar.jpg");
 
                             // Gán giá trị vào input sử dụng thuộc tính name
                             $("[name='username']").val(user.username || "");

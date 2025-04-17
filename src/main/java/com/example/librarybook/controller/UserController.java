@@ -50,7 +50,7 @@ public class UserController {
             String role = tmp.getRole();
             if (password.equals(tmp.getPassword()) && tmp.getStatus() == 1) {
                 session.setAttribute("user", tmp);
-                
+                session.setAttribute("role", role);
                 response.put("message", "Đăng nhập thành công!");
                 response.put("role", role);
                 return ResponseEntity.ok(response);

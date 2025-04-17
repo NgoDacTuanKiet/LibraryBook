@@ -78,8 +78,4 @@ public class Book {
     @JsonIgnore
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
     private List<PaymentDetail> paymentDetails = new ArrayList<>();
-
-    @ManyToOne
-    @JoinColumn(name = "libraryID")
-    private Library library;
 }

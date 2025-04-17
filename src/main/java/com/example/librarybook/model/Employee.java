@@ -25,10 +25,6 @@ public class Employee {
     @JoinColumn(name = "userID")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "libraryID", nullable = true)
-    private Library library;
-
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
     private List<Payment> payments = new ArrayList<>();
 }

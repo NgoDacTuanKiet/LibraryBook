@@ -27,7 +27,7 @@ public class Payment {
     private Employee employee;
 
     @ManyToOne
-    @JoinColumn(name = "customer")
+    @JoinColumn(name = "customerID")
     private Customer customer;
 
     @Column(name = "time")
@@ -39,6 +39,6 @@ public class Payment {
     @Column(name = "punish")
     private Long punish;
 
-    @OneToMany(mappedBy = "payment", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "payment", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
     private List<PaymentDetail> paymentDetails = new ArrayList<>();
 }

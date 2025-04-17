@@ -29,10 +29,16 @@
     <div class="container">
         <div class="sidebar">
             <a href="/admin/account/list">Quản lý khách hàng</a>
-            <a href="/admin/employee/list">Quản lý nhân viên</a>
+            
+            <% if ("ADMIN".equals(session.getAttribute("role"))) { %>
+                <a href="/admin/employee/list">Quản lý nhân viên</a>
+                <a href="/admin/category/edit">Quản lý thể loại</a>
+            <% }else { %>
+            <% } %>
+            
             <a href="/admin/book/list">Quản lý sách</a>
-            <a href="/admin/category/edit">Quản lý thể loại</a>
             <a href="/admin/rental/list">Quản lý thuê sách</a>
+            <a href="/admin/invoice/list">Hóa đơn</a>
         </div>
         
         <div class="content">

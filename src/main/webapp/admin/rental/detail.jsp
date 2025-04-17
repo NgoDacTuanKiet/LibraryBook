@@ -7,12 +7,11 @@
     <title>Detail Book Rental Management</title>
     <link rel="stylesheet" href="/CSS/manage.css">
     <link rel="stylesheet" href="/CSS/header_style.css">
-    <link rel="stylesheet" href="/CSS/searchBox.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
             const urlParams = new URLSearchParams(window.location.search);
-            const userId = urlParams.get('userId');
+            const customerId = urlParams.get('customerId');
 
             loadBorrowingBooks();
             loadUser();
@@ -35,14 +34,27 @@
                 $('input[name="borrowingBook"]:checked').each(function () {
                     let checkbox = $(this);
                     let row = checkbox.closest('tr');
+                    
+                    let book = JSON.parse(checkbox.attr("data-book"));
+                    let quantity = parseInt(row.find(".return-quantity").val()) || 0;
+                    let punishCost = parseInt(row.find(".punish-cost").val()) || 0;
+                    let max = parseInt(checkbox.data("quantity"));
+
+                    if (quantity > max) {
+                        alert("Số lượng trả sách " + book.bookName +  " không được vượt quá " + max);
+                        quantityInput.focus();
+                        isValid = false;
+                        return false;
+                    }
 
                     let paymentDTO = {
-                        bookId: parseInt(checkbox.data("book-id")),
+                        book: book,
                         bookLoanDate: checkbox.data("book-loan-date"),
                         dueDate: checkbox.data("due-date"),
-                        quantity: parseInt(row.find(".return-quantity").val()) || 0,
-                        punishCost: parseInt(row.find(".punish-cost").val()) || 0,
-                        reason: row.find(".reason").val() || ""
+                        quantity: quantity,
+                        punishCost: punishCost,
+                        reason: row.find(".reason").val() || "Không có",
+                        total: punishCost + quantity*10000
                     };
 
                     paymentList.push(paymentDTO);
@@ -54,12 +66,12 @@
                 }
 
                 $.ajax({
-                    url: "/api/payment/new/detail/" + userId,
+                    url: "/api/payment/new/detail/" + customerId,
                     type: "POST",
                     contentType: "application/json",
                     data: JSON.stringify(paymentList),
                     success: function (response) {
-                        window.location.href = "payment?userId=" + userId;
+                        window.location.href = "payment?customerId=" + customerId;
                     },
                     error: function (xhr, status, error) {
                         console.error("Lỗi khi gửi dữ liệu thanh toán:", error);
@@ -69,7 +81,7 @@
             
             function loadBorrowingBooks() {
                 $.ajax({
-                    url: "/api/borrow/borrowing/book/list/" + userId,
+                    url: "/api/borrow/borrowing/book/list/" + customerId,
                     type: "GET",
                     dataType: "json",
                     success: function (borrowingBooks) {
@@ -81,28 +93,55 @@
                                 ? borrowingBook.book.categoriesOfBook.map(category => category.name).join(", ")
                                 : "Không có thể loại";
                             
-                                let row = 
-                                    '<tr>' +
-                                        '<td>' +
-                                            '<input type="checkbox" name="borrowingBook" id="bor-' + borrowingBook.id + '" value="' + borrowingBook.id + '" ' +
-                                            'data-book-id="' + borrowingBook.book.id + '" ' +
-                                            'data-book-loan-date="' + borrowingBook.bookLoanDate + '" ' +
-                                            'data-due-date="' + borrowingBook.dueDate + '" ' +
-                                            'data-quantity="' + borrowingBook.quantity + '">' +
-                                        '</td>' +
-                                        '<td>' + borrowingBook.book.id + '</td>' +
-                                        '<td>' + borrowingBook.book.bookName + '</td>' +
-                                        '<td>' + borrowingBook.book.author + '</td>' +
-                                        '<td>' + borrowingBook.quantity + '</td>' +
-                                        '<td>' + formatDateTime(borrowingBook.bookLoanDate) + '</td>' +
-                                        '<td>' + formatDateTime(borrowingBook.dueDate) + '</td>' +
+                                let row = $("<tr>");
 
-                                        '<td><input type="number" class="return-quantity" min="0" max="' + borrowingBook.quantity + '" value="' + borrowingBook.quantity + '"></td>' +
-                                        '<td><input type="number" class="punish-cost" min="0" value="0"></td>' +
-                                        '<td><input type="text" class="reason" placeholder="Lý do nếu có"></td>' +
-                                    '</tr>';
-                            
-                            tableBody.append(row);
+                                let checkbox = $("<input>", {
+                                    type: "checkbox",
+                                    name: "borrowingBook",
+                                    id: "bor-" + borrowingBook.id,
+                                    value: borrowingBook.id,
+                                    "data-book": JSON.stringify(borrowingBook.book),
+                                    "data-book-loan-date": borrowingBook.bookLoanDate,
+                                    "data-due-date": borrowingBook.dueDate,
+                                    "data-quantity": borrowingBook.quantity
+                                });
+
+                                row.append($("<td>").append(checkbox));
+                                row.append($("<td>").text(borrowingBook.book.id));
+                                row.append($("<td>").text(borrowingBook.book.bookName));
+                                row.append($("<td>").text(borrowingBook.book.author));
+                                row.append($("<td>").text(borrowingBook.quantity));
+                                row.append($("<td>").text(formatDateTime(borrowingBook.bookLoanDate)));
+                                row.append($("<td>").text(formatDateTime(borrowingBook.dueDate)));
+
+                                row.append($("<td>").append(
+                                    $("<input>", {
+                                        type: "number",
+                                        class: "return-quantity",
+                                        min: 0,
+                                        max: borrowingBook.quantity,
+                                        value: 0
+                                    })
+                                ));
+
+                                row.append($("<td>").append(
+                                    $("<input>", {
+                                        type: "number",
+                                        class: "punish-cost",
+                                        min: 0,
+                                        value: 0
+                                    })
+                                ));
+
+                                row.append($("<td>").append(
+                                    $("<input>", {
+                                        type: "text",
+                                        class: "reason",
+                                        placeholder: "Lý do nếu có"
+                                    })
+                                ));
+
+                                tableBody.append(row);
                         });
                     },
                     error: function (xhr, status, error) {
@@ -113,7 +152,7 @@
 
             function loadUser() {
                 $.ajax({
-                    url: "/api/user/" + userId,
+                    url: "/api/user/" + customerId,
                     type: "GET",
                     dataType: "json",
                     success: function(data){
@@ -155,10 +194,16 @@
     <div class="container">
         <div class="sidebar">
             <a href="/admin/account/list">Quản lý khách hàng</a>
-            <a href="/admin/employee/list">Quản lý nhân viên</a>
+            
+            <% if ("ADMIN".equals(session.getAttribute("role"))) { %>
+                <a href="/admin/employee/list">Quản lý nhân viên</a>
+                <a href="/admin/category/edit">Quản lý thể loại</a>
+            <% }else { %>
+            <% } %>
+            
             <a href="/admin/book/list">Quản lý sách</a>
-            <a href="/admin/category/edit">Quản lý thể loại</a>
             <a href="/admin/rental/list">Quản lý thuê sách</a>
+            <a href="/admin/invoice/list">Hóa đơn</a>
         </div>
 
         <div class="content">

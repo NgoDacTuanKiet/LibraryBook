@@ -13,10 +13,10 @@
     <script>
         $(document).ready(function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const userId = urlParams.get('userId');
+            const customerId = urlParams.get('customerId');
 
             $.ajax({
-                url: "/api/user/" + userId,
+                url: "/api/user/" + customerId,
                 type: "GET",
                 dataType: "json",
                 success: function(data) {
@@ -28,8 +28,83 @@
             });
 
             $.ajax({
-                
-            })
+                url: "/api/payment/temp/detail/" + customerId,
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    let table = $(".table");
+                    let totalAmount = 0;
+                    data.forEach(item => {
+                        totalAmount += item.total;
+                        let row = 
+                            "<tr>" +
+                                "<td>" + item.book.id + "</td>" +
+                                "<td>" + item.book.bookName + "</td>" +
+                                "<td>" + item.book.author + "</td>" +
+                                "<td>" + item.quantity + "</td>" +
+                                "<td>" + formatDateTime(item.bookLoanDate) + "</td>" +
+                                "<td>" + formatDateTime(item.dueDate) + "</td>" +
+                                "<td>" + item.punishCost + "</td>" +
+                                "<td>" + item.reason + "</td>" +
+                                "<td>" + item.total + "</td>" +
+                            "</tr>";
+
+                        table.append(row);
+                    });
+
+                    let info = $(".info");
+                    info.append(
+                        $("<h3>").append("Thành tiền: ").append(totalAmount).append(" vnđ.")
+                    )
+                    info.append(
+                        $("<button>", {
+                            class: "btn",
+                            style: "background-color: #5a9bd5",
+                            id: "pay-btn"
+                        }).text("Thanh toán")
+                    )
+                },
+                error: function(xhr) {
+                    console.log("Lỗi khi lấy dữ liệu thanh toán tạm:", xhr.responseText);
+                }
+            });
+
+            $(document).on("click", "#pay-btn", function() {
+                let paymentItems = [];
+                $(".table tr:not(:first)").each(function() {
+                    let cells = $(this).find("td");
+
+                    let item = {
+                        book: {
+                            id: parseInt(cells.eq(0).text())
+                        },
+                        bookLoanDate: cells.eq(4).text(),
+                        dueDate: cells.eq(5).text(),
+                        punishCost: parseInt(cells.eq(6).text()) || 0,
+                        reason: cells.eq(7).text(),
+                        quantity: parseInt(cells.eq(3).text())
+                    };
+
+                    item.bookLoanDate = toISODate(item.bookLoanDate);
+                    item.dueDate = toISODate(item.dueDate);
+
+                    paymentItems.push(item);
+                });
+
+                $.ajax({
+                    url: "/api/payment/add/" + customerId,
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(paymentItems),
+                    success: function(response) {
+                        alert("Thanh toán thành công!");
+                        window.location.href = "/admin/invoice/list";
+                    },
+                    error: function(xhr) {
+                        alert("Đã xảy ra lỗi khi thanh toán: " + xhr.responseText);
+                    }
+                });
+            });
         });
 
         function goBack() {
@@ -39,6 +114,22 @@
                 window.location.href = "home";
             }
         }
+
+        function formatDateTime(isoString) {
+            let date = new Date(isoString);
+            return date.toLocaleString("vi-VN", {
+                day: '2-digit', month: '2-digit', year: 'numeric'
+            });
+        }
+
+        function toISODate(vnDateStr) {
+            var parts = vnDateStr.split("/");
+            var year = parts[2];
+            var month = parts[1];
+            var day = parts[0];
+            return year + "-" + month + "-" + day + "T00:00:00";
+        }
+
     </script>
 </head>
 <body>
@@ -60,10 +151,16 @@
     <div class="container">
         <div class="sidebar">
             <a href="/admin/account/list">Quản lý khách hàng</a>
-            <a href="/admin/employee/list">Quản lý nhân viên</a>
+            
+            <% if ("ADMIN".equals(session.getAttribute("role"))) { %>
+                <a href="/admin/employee/list">Quản lý nhân viên</a>
+                <a href="/admin/category/edit">Quản lý thể loại</a>
+            <% }else { %>
+            <% } %>
+            
             <a href="/admin/book/list">Quản lý sách</a>
-            <a href="/admin/category/edit">Quản lý thể loại</a>
             <a href="/admin/rental/list">Quản lý thuê sách</a>
+            <a href="/admin/invoice/list">Hóa đơn</a>
         </div>
         
         <a href="#" class="back-btn" onclick="goBack()">Back</a>
@@ -90,21 +187,21 @@
             </div>
     
             <table class="table">
-                <tr>
+                <thead>
                     <th>Mã sách</th>
                     <th>Tên sách</th>
                     <th>Tác giả</th>
-                    <th>Nhà xuất bản</th>
-                    <th>Thể loại</th>
                     <th>Số lượng</th>
                     <th>Ngày mượn</th>
                     <th>Hạn</th>
-                </tr>
+                    <th>Tiền phạt</th>
+                    <th>Lý do</th>
+                    <th>Thành tiền</th>
+                </thead>
             </table>
 
             <div class="info">
-                <h3>Thành tiền: 300.000đ</h3>
-                <a href="payment" class="btn" style="background-color: #5a9bd5">Thanh toán</a>
+
             </div>
         </div>
     </div>

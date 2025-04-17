@@ -81,15 +81,15 @@ public class BorrowController {
             Book book = i.getBook();
             book.setAvailableQuantity(book.getAvailableQuantity() - i.getQuantity());
             bookService.saveBook(book);
-            
+                
             BookBorrowing bookBorrowing = bookBorrowingService.findByBookIdAndCustomerId(i.getBook().getId(), customer.getId());
             bookBorrowing.setBook(i.getBook());
             bookBorrowing.setCustomer(customer);
             bookBorrowing.setDueDate(LocalDateTime.now().plusDays(30));
-            bookBorrowing.setQuantity(bookBorrowing.getQuantity() + i.getQuantity());
-            if(bookBorrowing.getQuantity() == 0){
+            if(bookBorrowing.getQuantity() == 0L){
                 bookBorrowing.setBookLoanDate(LocalDateTime.now());
             }
+            bookBorrowing.setQuantity(bookBorrowing.getQuantity() + i.getQuantity());
             bookBorrowings.add(bookBorrowing);
 
             if(!bookBorroweds.contains(i.getBook())){

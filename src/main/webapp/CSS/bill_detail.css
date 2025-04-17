@@ -1,19 +1,11 @@
-/* Đặt kiểu cho toàn bộ trang */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-}
-
-/* Container */
-.container {
+.content {
     width: 80%;
     margin: 20px auto;
     padding: 20px;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid black;
 }
 
 h2 {
@@ -80,6 +72,10 @@ h2 {
         display: none;
     }
 
+    .sidebar {
+        display: none;
+    }
+
     /* Ẩn nút in */
     .btn-print {
         display: none;
@@ -104,4 +100,33 @@ h2 {
 
 .btn-print:hover {
     background-color: #45a049;
+}
+
+/* Dòng hiển thị Thành tiền bên trái, Thời gian bên phải */
+.info-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+}
+
+.info-box {
+    text-align: left;
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: #555;
+}
+
+.info-box p {
+    margin: 6px 0;
+}
+
+.info-box strong {
+    display: inline-block;
+    min-width: 140px;
+    font-weight: 600;
+    color: #333;
 }

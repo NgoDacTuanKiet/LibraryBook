@@ -8,6 +8,65 @@
     <link rel="stylesheet" href="/CSS/manage.css">
     <link rel="stylesheet" href="/CSS/header_style.css">
     <link rel="stylesheet" href="/CSS/edit.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            getUser();
+
+            $("#change-password-form").submit(function (event) {
+                event.preventDefault();
+
+                let userPassword = $("#user-password").val();
+                let password = $("#current-password").val();
+                let newPassword = $("#new-password").val();
+                let confirmPassword = $("#confirm-password").val();
+                let errorMessage = $("#error-message");
+
+                if (userPassword != password) {
+                    errorMessage.text("Mật khẩu không chính xác!");
+                    return;
+                } else if (newPassword != confirmPassword) {
+                    errorMessage.text("Mật khẩu xác nhận không khớp!");
+                    return;
+                } else {
+                    errorMessage.text("");
+                }
+
+                $.ajax({
+                    url: "/api/user/changepassword",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        password: newPassword
+                    }),
+                    success: function(response) {
+                        alert("Đổi mật khẩu thành công!");
+                        window.location.href = "/admin/account/list";
+                    },
+                    error: function(xhr) {
+                        errorMessage.text("Lỗi");
+                    }
+                })
+            })
+
+            function getUser () {
+                $.ajax({
+                    url: "/api/user/information",
+                    method: "GET",
+                    dataType: "json",
+                    success: function(user) {
+
+                        if ($.isEmptyObject(user)) {
+                            alert("Vui lòng đăng nhập!");
+                            window.location.href = "/signin";
+                        } else {
+                            $("#user-password").val(user.password);
+                        }
+                    }
+                })
+            }
+        })
+    </script>
 </head>
 <body>
     <!-- header -->
@@ -28,29 +87,39 @@
     <div class="container">
         <div class="sidebar">
             <a href="/admin/account/list">Quản lý khách hàng</a>
-            <a href="/admin/employee/list">Quản lý nhân viên</a>
+            
+            <% if ("ADMIN".equals(session.getAttribute("role"))) { %>
+                <a href="/admin/employee/list">Quản lý nhân viên</a>
+                <a href="/admin/category/edit">Quản lý thể loại</a>
+            <% }else { %>
+            <% } %>
+            
             <a href="/admin/book/list">Quản lý sách</a>
-            <a href="/admin/category/edit">Quản lý thể loại</a>
             <a href="/admin/rental/list">Quản lý thuê sách</a>
+            <a href="/admin/invoice/list">Hóa đơn</a>
         </div>
         
         
-        <div class="form-box">
+        <form class="form-box" id="change-password-form">
             <div class="title">Đổi mật khẩu</div>
+            <input type="hidden" id="user-password">
             <div class="form-group">
-                <label for="name">Tài khoản</label>
-                <input type="text">
+                <label for="current-password">Mật khẩu hiện tại</label>
+                <input type="password" id="current-password" name="current-password" required>
             </div>
             <div class="form-group">
-                <label for="name">Mật khẩu</label>
-                <input type="text">
+                <label for="current-password">Mật khẩu mới</label>
+                <input type="password" id="new-password" name="new-password" required>
             </div>
             <div class="form-group">
-                <label for="phone">Nhập lại mật khẩu</label>
-                <input type="text">
-            </div>
+                <label for="confirm-password">Xác nhận mật khẩu mới</label>
+                <input type="password" id="confirm-password" name="confirm-password" required>
+            </form>
+            
+            <p id="error-message" style="color: red;"></p>
+
             <div class="btn-group">
-                <button class="btn btn-add">Cập nhật</button>
+                <button type="submit" class="btn btn-add">Xác nhận</button>
             </div>
         </div>
     </div>

@@ -29,10 +29,16 @@
     <div class="container">
         <div class="sidebar">
             <a href="/admin/account/list">Quản lý khách hàng</a>
-            <a href="/admin/employee/list">Quản lý nhân viên</a>
+            
+            <% if ("ADMIN".equals(session.getAttribute("role"))) { %>
+                <a href="/admin/employee/list">Quản lý nhân viên</a>
+                <a href="/admin/category/edit">Quản lý thể loại</a>
+            <% }else { %>
+            <% } %>
+            
             <a href="/admin/book/list">Quản lý sách</a>
-            <a href="/admin/category/edit">Quản lý thể loại</a>
             <a href="/admin/rental/list">Quản lý thuê sách</a>
+            <a href="/admin/invoice/list">Hóa đơn</a>
         </div>
 
         <div class="form-box">
@@ -61,7 +67,7 @@
                 </div>                
 
                 <div class="form-group">
-                    <label for="quantity">Số lượng</label>
+                    <label for="quantity">Số lượng nhập thêm</label>
                     <input type="number" name="quantity" required>
                 </div>
 
@@ -106,7 +112,7 @@
                         $("input[name='author']").val(book.author);
                         $("input[name='publisher']").val(book.publisher);
                         $("input[name='yearOfpublication']").val(book.yearOfpublication);
-                        $("input[name='quantity']").val(book.quantity);
+                        $("input[name='quantity']").val(0);
                         $("input[name='describe']").val(book.describe);
 
                         // Hiển thị ảnh nếu có
@@ -143,14 +149,14 @@
                         
                         row.append(checkbox);
 
-                        // Mỗi 3 checkbox, tạo một dòng mới
-                        if ((index + 1) % 3 === 0) {
+                        // Mỗi 4 checkbox, tạo một dòng mới
+                        if ((index + 1) % 4 === 0) {
                             categorySelect.append(row);
                             row = $('<div class="checkbox-row"></div>');
                         }
                     });
 
-                    // Thêm dòng cuối nếu chưa đủ 3 checkbox
+                    // Thêm dòng cuối nếu chưa đủ 4 checkbox
                     if (row.children().length > 0) {
                         categorySelect.append(row);
                     }

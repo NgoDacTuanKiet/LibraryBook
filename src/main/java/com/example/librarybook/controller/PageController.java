@@ -111,6 +111,16 @@ public class PageController {
         return "forward:/admin/rental/list.jsp";
     }
 
+    @GetMapping("/admin/invoice/list")
+    public String adminInvoiceList() {
+        return "forward:/admin/invoice/list.jsp";
+    }
+
+    @GetMapping("/admin/invoice/detail")
+    public String adminDetailList() {
+        return "forward:/admin/invoice/detail.jsp";
+    }
+
     @GetMapping("/admin/rental/payment")
     public String adminRentalPayment() {
         return "forward:/admin/rental/payment.jsp";
