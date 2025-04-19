@@ -29,9 +29,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    // @Autowired
-    // private LibraryService libraryService;
     
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> signin(@RequestBody User user, HttpSession session) {
@@ -94,14 +91,12 @@ public class UserController {
             newUser.setEmployee(employee);
             employee.setUser(newUser);
             employee.setId(newUser.getId());
-            // employee.setLibrary(libraryService.findLibraryById(1L).orElse(null));
         } else {
             Employee employee = new Employee();
             newUser.setRole("EMPLOYEE");
             newUser.setEmployee(employee);
             employee.setUser(newUser);
             employee.setId(newUser.getId());
-            // employee.setLibrary(libraryService.findLibraryById(1L).orElse(null));
         }
 
         userService.saveUser(newUser);
