@@ -104,7 +104,7 @@ public class PaymentController {
         
         paymentService.save(payment);
         tmpPaymentResponse.remove(customerId);
-        response.put("message", "");
+        response.put("message", "Thanh toán thành công");
         return ResponseEntity.ok().body(response);
     }
     

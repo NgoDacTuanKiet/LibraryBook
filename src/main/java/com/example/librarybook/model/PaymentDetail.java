@@ -34,7 +34,7 @@ public class PaymentDetail {
     @Column(name = "punishCost")
     private Long punishCost;
 
-    @Column(name = "reason")
+    @Column(name = "reason", columnDefinition = "NVARCHAR(100)")
     private String reason;
 
     @JsonIgnore

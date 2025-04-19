@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,15 +22,12 @@ import com.example.librarybook.model.User;
 import com.example.librarybook.services.BookService;
 import com.example.librarybook.services.CategoryService;
 import com.example.librarybook.services.CustomerService;
-// import com.example.librarybook.services.LibraryService;
 
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-// import org.springframework.web.bind.annotation.PostMapping;
-// import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
@@ -46,9 +42,6 @@ public class BookController {
 
     @Autowired
     private CustomerService customerService;
-
-    // @Autowired
-    // private LibraryService libraryService;
     
     @GetMapping("/search")
     public ResponseEntity<List<Book>> searchBooks(
@@ -76,7 +69,6 @@ public class BookController {
             newBook.setAvailableQuantity(newBook.getQuantity());
             newBook.setDescribe((String) formData.get("describe"));
             newBook.setStatus(1);
-            // newBook.setLibrary(libraryService.findLibraryById(1L).orElse(null));
 
             // Xử lý lưu ảnh (nếu có)
             if (!imageFile.isEmpty()) {
@@ -120,8 +112,10 @@ public class BookController {
 
     @PostMapping("/love/{bookId}")
     public ResponseEntity<String> loveBook(@PathVariable Long bookId, HttpSession session) {
-        Long userId = ((User) session.getAttribute("User")).getId();
-        Customer customer = customerService.getCustomerById(userId);
+        User user = ((User) session.getAttribute("user"));
+
+        Long userId = user.getId();
+        Customer customer = customerService.getCustomerByUserId(userId);
         Book book = bookService.getBookByID(bookId);
 
         List<Customer> customers = book.getLikedByCustomers();

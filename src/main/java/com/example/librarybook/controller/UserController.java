@@ -4,7 +4,6 @@ import com.example.librarybook.model.User;
 import com.example.librarybook.model.Cart;
 import com.example.librarybook.model.Customer;
 import com.example.librarybook.model.Employee;
-// import com.example.librarybook.services.LibraryService;
 import com.example.librarybook.services.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -14,15 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -147,37 +141,7 @@ public class UserController {
         List<User> users = userService.searchUser(username, fullName, phoneNumber, email, role, 1);
         return ResponseEntity.ok(users);
     }
-    
-    @PostMapping(value = "/edit", consumes = "multipart/form-data")
-    public String editUser(@RequestParam Map<String, Object> formData,
-                        @RequestParam("image") MultipartFile imageFile) {
-        try {
-            User newUser = userService.getUserById((Long) formData.get("id")).orElse(null);
-            newUser.setPhoneNumber((String) formData.get("phoneName"));
-            newUser.setEmail((String) formData.get("email"));
-            newUser.setAddress((String) formData.get("address"));
-            newUser.setFullName((String) formData.get("fullName"));
 
-            // Xử lý lưu ảnh (nếu có)
-            if (!imageFile.isEmpty()) {
-                String fileName = imageFile.getOriginalFilename();
-                String uploadDir = "src/main/resources/static/uploads/user/";
-                Path uploadPath = Paths.get(uploadDir);
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
-                }
-                Files.copy(imageFile.getInputStream(), uploadPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
-                newUser.setImageUrl("/uploads/user/" + fileName);
-            }
-
-            userService.saveUser(newUser);
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "redirect:/admin/user/list?error";
-        }
-        return "redirect:/admin/book/list?success";
-    }
     @GetMapping("/information")
     public ResponseEntity<User> infomation(HttpSession session) {
         User sessionUser = (User) session.getAttribute("user");
@@ -200,21 +164,12 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
     
-    @PostMapping("/current")
-    public ResponseEntity<?> getCurrentUser(HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Chưa đăng nhập");
-        }
-        return ResponseEntity.ok(user);
-    }
-
     @GetMapping("/{userId}")
     public User getUserbyId(@PathVariable Long userId) {
         User user = userService.getUserById(userId).get();
         return user;
     }
-    
+    //chua postman
     @PostMapping("/update")
     public ResponseEntity<Map<String,String>> updateCustomer(@RequestBody User user) {
         User tmp = userService.getUserByUsername(user.getUsername()).get();
@@ -236,7 +191,7 @@ public class UserController {
         user.setStatus(0);
         userService.saveUser(user);
         Map<String, String> response = new HashMap<>();
-        response.put("message", "");
+        response.put("message", "Xóa người dùng thành công!");
         return ResponseEntity.ok().body(response);
     }
     
