@@ -165,7 +165,7 @@
         
         <a href="#" class="back-btn" onclick="goBack()">Back</a>
         
-        <div class="model">
+        <div class="model" style="margin-left: 15%;">
             <div class="form-box">
                 <div class="title">Thông tin khách hàng</div>
                 <div class="form-group">

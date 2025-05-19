@@ -5,5 +5,7 @@ import java.util.List;
 import com.example.librarybook.model.User;
 
 public interface UserRepositoryCustom {
-    List<User> findUserByRequest(String username, String fullName, String phoneNumber, String email, String role, Integer status);
+    List<User> findUserByRequest(String username, String fullName, String phoneNumber, String email, String role, Integer status, Long offset, Long pageSize);
+
+    Long findUserCountByRequest(String username, String fullName, String phoneNumber, String email, String role, Integer status);
 }

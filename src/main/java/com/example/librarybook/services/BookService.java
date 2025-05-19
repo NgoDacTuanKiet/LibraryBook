@@ -30,8 +30,12 @@ public class BookService {
         return bookRepository.save(book);
     }
 
-    public List<Book> searchBooks(String bookName, String publisher, String author, String yearOfpublication, List<Long> categories, Integer status) {
-        return bookRepository.findBookByRequest(bookName, publisher, author, yearOfpublication, categories, status);
+    public List<Book> searchBooks(String bookName, String publisher, String author, String yearOfpublication, List<Long> categories, Integer status, Long offset, Long pageSize) {
+        return bookRepository.findBookByRequest(bookName, publisher, author, yearOfpublication, categories, status, offset, pageSize);
+    }
+
+    public Long findBookCountByRequest(String bookName, String publisher, String author, String yearOfpublication, List<Long> categories, Integer status){
+        return bookRepository.findBookCountByRequest(bookName, publisher, author, yearOfpublication, categories, status);
     }
 
     public void deleteById(Long id){

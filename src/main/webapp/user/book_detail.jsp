@@ -107,7 +107,7 @@
                             $("#commentContent").val("");
                         },
                         error: function() {
-                            alert("Lỗi khi gửi bình luận");
+                            alert("Hãy đăng nhập trước!");
                         }
                     });
                 }
@@ -175,9 +175,11 @@
                 type: "GET",
                 success: function (isFavorited) {
                     if (isFavorited) {
+                        $("#addToCartBtn").show();
                         $("#unLoveBtn").show();
                         $("#loveBtn").hide();
                     } else {
+                        $("#addToCartBtn").show();
                         $("#unLoveBtn").hide();
                         $("#loveBtn").show();
                     }
@@ -239,7 +241,7 @@
                 <div class="button-group">
                     <button class="btn" id="loveBtn" style="display: none;">Yêu thích</button>
                     <button class="btn" id="unLoveBtn" style="display: none;">Bỏ yêu thích</button>
-                    <button class="btn" id="addToCartBtn">Thêm vào giỏ</button>
+                    <button class="btn" id="addToCartBtn" style="display: none;">Thêm vào giỏ</button>
                 </div>
             </div>
         </div>

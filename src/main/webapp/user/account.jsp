@@ -76,7 +76,69 @@
                         alert(errorMessage);
                     }
                 });
-            })
+            });
+
+            $("#avatarInput").change(function () {
+                let file = this.files[0];
+                if (!file) return;
+
+                let formData = new FormData();
+                formData.append("avatar", file);
+
+                $.ajax({
+                    url: "/api/user/upload-avatar",  // API phía backend cần tạo
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    xhrFields: { withCredentials: true },
+                    success: function (response) {
+                        alert("Cập nhật ảnh đại diện thành công!");
+                        loadInformation(); // Tải lại ảnh mới
+                    },
+                    error: function (xhr) {
+                        console.error("Lỗi cập nhật ảnh:", xhr.responseText);
+                        alert("Cập nhật ảnh đại diện thất bại!");
+                    }
+                });
+            });
+
+            // Xem trước ảnh khi chọn
+            $("input[name='image']").change(function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $(".avatar-preview").attr("src", e.target.result).show();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Gửi ảnh lên server
+            $("#updateAvatarBtn").click(function (e) {
+                e.preventDefault();
+                
+                const formData = new FormData($("#avatarForm")[0]);
+
+                $.ajax({
+                    url: "/api/user/update-avatar",  // URL xử lý riêng ảnh
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        alert("Cập nhật ảnh thành công!");
+                        // Cập nhật ảnh hiển thị nếu có
+                        if (response.imageUrl) {
+                            $(".avatar-preview").attr("src", response.imageUrl);
+                        }
+                    },
+                    error: function () {
+                        alert("Lỗi khi cập nhật ảnh!");
+                    }
+                });
+            });
         })
     </script>
 </head>
@@ -103,7 +165,17 @@
     <!-- Thông tin cá nhân -->
     <div class="profile-container">
         <div class="profile-card">
-            <img alt="Avatar" class="avatar">
+            <!-- <img alt="Avatar" class="avatar"> -->
+             <form id="avatarForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="image">Ảnh đại diện</label>
+                    <img class="avatar-preview" src="#" alt="Ảnh hiện tại" style="display:none; margin-top:10px; max-width: 200px;" />
+                    <input type="hidden" name="currentImageUrl" value="">
+                    <input type="file" name="image" accept="image/*" required>
+                </div>
+                <button type="button" id="updateAvatarBtn" class="btn btn-add">Cập nhật ảnh</button>
+            </form>
+
             <div class="info-container">
                 <div class="info">
                     <p><strong>Tài khoản: </strong> <input type="text" name = "username" readonly></p>

@@ -11,11 +11,18 @@
 
     <script>
         $(document).ready(function () {
+            let currentPage = 1;
+
             loadBooks();
+
+            window.goToPage = function(page) {
+                currentPage = page;
+                loadBooks();
+            }
 
             function renderBooks(books) {
                 var bookList = $("#book-list");
-                bookList.empty(); // Xóa danh sách cũ
+                bookList.empty();
 
                 if (books.length === 0) {
                     bookList.append("<p>Không tìm thấy sách nào!</p>");
@@ -53,11 +60,15 @@
                         bookName: bookName,
                         author: author,
                         publisher: publisher,
-                        categories: selectedCategories
+                        categories: selectedCategories,
+                        pageSize: $("#pageSize").val(),
+                        page: currentPage
                     },
                     dataType: "json",
-                    success: function (books) {
-                        renderBooks(books)
+                    success: function (response) {
+                        let books = response.books;
+                        renderBooks(books);
+                        updatePagination(currentPage, response.totalPages);
                     },
                     error: function (xhr, status, error) {
                         console.error("Lỗi khi tải danh sách sách:", error);
@@ -65,7 +76,40 @@
                 });
             }
 
+            function updatePagination(currentPage, totalPages) {
+                const pagination = $("#pagination");
+                pagination.empty();
+
+                const prevDisabled = currentPage <= 1 ? "disabled" : "";
+                pagination.append(
+                    "<button " + prevDisabled + " onclick=\"goToPage(" + (currentPage - 1) + ")\">&laquo;</button>"
+                );
+
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+
+                if (currentPage <= 3) {
+                    endPage = Math.min(5, totalPages);
+                }
+                if (currentPage >= totalPages - 2) {
+                    startPage = Math.max(1, totalPages - 4);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const active = i === currentPage ? "active" : "";
+                    pagination.append(
+                        "<button class=\"" + active + "\" onclick=\"goToPage(" + i + ")\">" + i + "</button>"
+                    );
+                }
+
+                const nextDisabled = currentPage >= totalPages ? "disabled" : "";
+                pagination.append(
+                    "<button " + nextDisabled + " onclick=\"goToPage(" + (currentPage + 1) + ")\">&raquo;</button>"
+                );
+            }
+
             $("#searchBtn").click(function () {
+                currentPage = 1;
                 loadBooks();
             });
 
@@ -86,7 +130,7 @@
                         
                         row.append(checkbox);
 
-                        if ((index + 1) % 7 === 0) {
+                        if ((index + 1) % 5 === 0) {
                             categorySelect.append(row);
                             row = $('<div class="checkbox-row"></div>');
                         }
@@ -145,7 +189,15 @@
                     <label>Thể loại:</label>
                     <div id="categories-container" class="checkbox-container"></div>
                 </div>
-            </div>
+            </div>  
+            <div class="pagination-control">
+                <label for="pageSize">Kích thước trang:</label>
+                <select id="pageSize">
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>  
             <button class="btn" id="searchBtn">Tìm kiếm</button>
         </div>
 
@@ -154,13 +206,7 @@
             <!-- Dữ liệu sách sẽ được thêm vào đây -->
         </div>
 
-        <div class="pages">
-            <a href="#">1</a>
-            <a href="#">2</a>
-            <a href="#">3</a>
-            <a href="#">4</a>
-            <a href="#">5</a>
-        </div>
+        <div id="pagination" class="pagination"></div>
     </div>
 
 </body>

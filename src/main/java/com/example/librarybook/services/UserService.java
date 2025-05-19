@@ -51,7 +51,11 @@ public class UserService {
         return userRepository.existsByUsername(username);
     }
 
-    public List<User> searchUser(String username, String fullName, String phoneNumber, String email, String role, Integer status){
-        return userRepository.findUserByRequest(username, fullName, phoneNumber, email, role, status);
+    public List<User> searchUser(String username, String fullName, String phoneNumber, String email, String role, Integer status, Long offset, Long pageSize){
+        return userRepository.findUserByRequest(username, fullName, phoneNumber, email, role, status, offset, pageSize);
+    }
+
+    public Long countUserByRequest(String username, String fullName, String phoneNumber, String email, String role, Integer status){
+        return userRepository.findUserCountByRequest(username, fullName, phoneNumber, email, role, status);
     }
 }

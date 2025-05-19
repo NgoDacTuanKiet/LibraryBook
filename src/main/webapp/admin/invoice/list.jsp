@@ -15,10 +15,24 @@
         $(document).ready(function () {
             loadPayments();
             
+            $("#searchBtn").click(function() {
+                loadBooks();
+            });
+
             function loadPayments(){
+                const customerFullName = $("#customerFullName").val();
+                const customerPhoneNumber = $("#customerPhoneNumber").val();
+                const employeeFullName = $("#employeeFullName").val();
+
                 $.ajax({
-                    url: "/api/payment/list",
+                    url: "/api/payment/search",
                     type: "GET",
+                    data: {
+                        customerFullName: customerFullName,
+                        customerPhoneNumber: customerPhoneNumber,
+                        employeeFullName: employeeFullName
+                    },
+                    dataType: "json",
                     success: function (invoiceResponseDTOs) {
                         let billTableBody = $(".bill-table tbody");
                         billTableBody.empty();
@@ -90,6 +104,16 @@
         </div>
         
         <div class="content">
+            <h2>Tìm kiếm hoá đơn</h2>
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="customerFullName" placeholder="Tên khách hàng">
+                    <input type="text" id="customerPhoneNumber" placeholder="Số điện thoại khách hàng">
+                    <input type="text" id="employeeFullName" placeholder="Tên nhân viên">
+                </div>
+                <button class="btn" id="searchBtn">Tìm kiếm</button>
+            </div>
+            
             <table class="bill-table">
                 <thead>
                     <tr>

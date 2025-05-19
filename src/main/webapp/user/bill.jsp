@@ -12,13 +12,27 @@
 
     <script>
         $(document).ready(function () {
+            let currentPage = 1;
+
+            getBillList();
+
+            window.goToPage = function(page) {
+                currentPage = page;
+                getBillList();
+            }
+
             function getBillList() {
                 $.ajax({
                     url: "/api/borrow/borrowing/list",
                     type: "GET",
+                    data: {
+                        pageSize: 10,
+                        page: currentPage
+                    },
                     dataType: "json",
-                    success: function(borrowingResponseDTO) {
-                        renderBills(borrowingResponseDTO);
+                    success: function(response) {
+                        renderBills(response);
+                        updatePagination(currentPage, response.totalPages);
                     },
                     error: function(xhr, status, error) {
                         console.error("Lỗi khi tải danh sách hóa đơn:", error);
@@ -52,6 +66,37 @@
                     billTableBody.append(row);
                 });
             }
+            function updatePagination(currentPage, totalPages) {
+                const pagination = $("#pagination");
+                pagination.empty();
+
+                const prevDisabled = currentPage <= 1 ? "disabled" : "";
+                pagination.append(
+                    "<button " + prevDisabled + " onclick=\"goToPage(" + (currentPage - 1) + ")\">&laquo;</button>"
+                );
+
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+
+                if (currentPage <= 3) {
+                    endPage = Math.min(5, totalPages);
+                }
+                if (currentPage >= totalPages - 2) {
+                    startPage = Math.max(1, totalPages - 4);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const active = i === currentPage ? "active" : "";
+                    pagination.append(
+                        "<button class=\"" + active + "\" onclick=\"goToPage(" + i + ")\">" + i + "</button>"
+                    );
+                }
+
+                const nextDisabled = currentPage >= totalPages ? "disabled" : "";
+                pagination.append(
+                    "<button " + nextDisabled + " onclick=\"goToPage(" + (currentPage + 1) + ")\">&raquo;</button>"
+                );
+            }
 
             function formatDateTime(isoString) {
                 let date = new Date(isoString);
@@ -61,7 +106,6 @@
                 });
             }
             
-            getBillList();
         });
     </script>
 
@@ -112,6 +156,7 @@
                 <!-- Dữ liệu sẽ được thêm vào đây bằng jQuery -->
             </tbody>
         </table>
+        <div id="pagination" class="pagination"></div>
     </div>
 </body>
 </html>

@@ -11,7 +11,14 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
+            let currentPage = 1;
+
             loadUsers();
+
+            window.goToPage = function(page) {
+                currentPage = page;
+                loadUsers();
+            }
 
             $("#btnSearch").click(function() {
                 loadUsers();
@@ -22,7 +29,10 @@
                 const phoneNumber = $("#searchPhone").val();
                 const email = $("#searchEmail").val();
 
-                let data = {};
+                let data = {
+                    pageSize: 10,
+                    page: currentPage
+                };
                 if (fullName) data.fullName = fullName;
                 if (phoneNumber) data.phoneNumber = phoneNumber;
                 if (email) data.email = email;
@@ -32,7 +42,8 @@
                     type: "GET",
                     data: data,
                     dataType: "json",
-                    success: function (users) {
+                    success: function (response) {
+                        users = response.users;
                         let tableBody = $(".table tbody");
                         tableBody.empty(); 
 
@@ -53,11 +64,44 @@
                             
                             tableBody.append(row);
                         });
+                        updatePagination(currentPage, response.totalPages);
                     },
                     error: function (xhr, status, error) {
                         console.error("Lỗi khi tải danh sách sách:", error);
                     }
                 });
+            }
+
+            function updatePagination(currentPage, totalPages) {
+                const pagination = $("#pagination");
+                pagination.empty();
+
+                const prevDisabled = currentPage <= 1 ? "disabled" : "";
+                pagination.append(
+                    "<button " + prevDisabled + " onclick=\"goToPage(" + (currentPage - 1) + ")\">&laquo;</button>"
+                );
+
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+
+                if (currentPage <= 3) {
+                    endPage = Math.min(5, totalPages);
+                }
+                if (currentPage >= totalPages - 2) {
+                    startPage = Math.max(1, totalPages - 4);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const active = i === currentPage ? "active" : "";
+                    pagination.append(
+                        "<button class=\"" + active + "\" onclick=\"goToPage(" + i + ")\">" + i + "</button>"
+                    );
+                }
+
+                const nextDisabled = currentPage >= totalPages ? "disabled" : "";
+                pagination.append(
+                    "<button " + nextDisabled + " onclick=\"goToPage(" + (currentPage + 1) + ")\">&raquo;</button>"
+                );
             }
         });
     </script>
@@ -120,6 +164,7 @@
 
                 </tbody>
             </table>
+            <div id="pagination" class="pagination"></div>
         </div>
     </div>
 </body>

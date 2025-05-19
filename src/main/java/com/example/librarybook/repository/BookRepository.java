@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>, BookRepositoryCustom {
    
-    // Tìm kiếm sách theo tù khóa tên
+    // Tìm kiếm sách theo từ khóa tên
     List<Book> findByBookNameContaining(String keyword);
 }

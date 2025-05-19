@@ -8,11 +8,12 @@ body {
 .container {
     display: flex;
     justify-content: flex-start;
-    margin-top: 50px;
+    margin: 0;
     padding-left: 50px;
 }
 
 .content-box {
+    margin-top: 80px;
     background-color: #F4EBDC;
     padding: 20px;
     border-radius: 20px;

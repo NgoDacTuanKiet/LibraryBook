@@ -3,6 +3,8 @@ package com.example.librarybook.controller;
 import com.example.librarybook.model.Category;
 import com.example.librarybook.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +22,22 @@ public class CategoryController {
 
     // Lấy danh sách thể loại
     @GetMapping
-    public List<Category> getAllCategories() {
-        return categoryService.getAllCategories();
+    public Map<String, Object> getAllCategories(@RequestParam Long page,
+                                           @RequestParam Long pageSize) {
+        Pageable pageable = PageRequest.of(page.intValue() - 1, pageSize.intValue());
+        List<Category> categories = categoryService.getAllCategoriesPageable(pageable);
+        Long totalCategory = categoryService.getNumberOfCategory();
+        Long totalPages = totalCategory / pageSize;
+        if (totalPages * pageSize < totalCategory)
+            totalPages += 1;
+        Long start = (page-1) * pageSize;
+        Long end = start + pageSize - 1;
+        if (end > totalCategory - 1)
+            end = totalCategory - 1;
+        Map<String, Object> response = new HashMap<>();
+        response.put("categories", categories);
+        response.put("totalPages", totalPages);
+        return response;
     }
 
     // Lấy thể loại theo ID

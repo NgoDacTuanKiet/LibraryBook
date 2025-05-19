@@ -130,7 +130,7 @@
             <a href="/admin/invoice/list">Hóa đơn</a>
         </div>
         
-        <div class="content">
+        <div class="content" style="margin-left: 25%;">
             <h2>Chi Tiết Hóa Đơn</h2>
         
             <div class="info-box">

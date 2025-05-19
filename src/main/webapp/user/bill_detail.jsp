@@ -124,9 +124,11 @@
 
             </tbody>
         </table>
-
-        <a href="bill" class="btn-back">Quay lại danh sách hóa đơn</a>
-        <button id="printBill" class="btn-print">In hóa đơn</button>
+        <div class="but">
+            <a href="bill" class="btn-back">Quay lại danh sách hóa đơn</a>
+            <button id="printBill" class="btn-print">In hóa đơn</button>
+        </div>
+        
     </div>
 </body>
 </html>

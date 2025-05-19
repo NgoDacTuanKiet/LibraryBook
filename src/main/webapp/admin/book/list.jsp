@@ -11,9 +11,17 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
-            loadBooks(); // Gọi hàm tải sách khi trang vừa load
+            let currentPage = 1;
+
+            loadBooks();
+
+            window.goToPage = function(page) {
+                currentPage = page;
+                loadBooks();
+            }
 
             $("#searchBtn").click(function() {
+                currentPage = 1;
                 loadBooks();
             });
 
@@ -21,6 +29,7 @@
                 const bookName = $("#bookName").val();
                 const author = $("#author").val();
                 const publisher = $("#publisher").val();
+                const pageSize = $("#pageSize").val();
 
                 let selectedCategories = [];
                 $("input[name='categories']:checked").each(function () {
@@ -35,10 +44,13 @@
                         bookName: bookName,
                         author: author,
                         publisher: publisher,
-                        categories: selectedCategories
+                        categories: selectedCategories,
+                        pageSize: pageSize,
+                        page: currentPage
                     },
                     dataType: "json",
-                    success: function (books) {
+                    success: function (response) {
+                        let books = response.books;
                         let tableBody = $(".table tbody");
                         tableBody.empty();
                         
@@ -70,11 +82,44 @@
                             
                             tableBody.append(row);
                         });
+                        updatePagination(currentPage, response.totalPages);
                     },
                     error: function (xhr, status, error) {
                         console.error("Lỗi khi tải danh sách sách:", error);
                     }
                 });
+            }
+
+            function updatePagination(currentPage, totalPages) {
+                const pagination = $("#pagination");
+                pagination.empty();
+
+                const prevDisabled = currentPage <= 1 ? "disabled" : "";
+                pagination.append(
+                    "<button " + prevDisabled + " onclick=\"goToPage(" + (currentPage - 1) + ")\">&laquo;</button>"
+                );
+
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+
+                if (currentPage <= 3) {
+                    endPage = Math.min(5, totalPages);
+                }
+                if (currentPage >= totalPages - 2) {
+                    startPage = Math.max(1, totalPages - 4);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const active = i === currentPage ? "active" : "";
+                    pagination.append(
+                        "<button class=\"" + active + "\" onclick=\"goToPage(" + i + ")\">" + i + "</button>"
+                    );
+                }
+
+                const nextDisabled = currentPage >= totalPages ? "disabled" : "";
+                pagination.append(
+                    "<button " + nextDisabled + " onclick=\"goToPage(" + (currentPage + 1) + ")\">&raquo;</button>"
+                );
             }
 
             window.deleteBook = function (id) {
@@ -173,6 +218,14 @@
                         <div id="categories-container" class="checkbox-container"></div>
                     </div>
                 </div>
+                <div class="pagination-control">
+                    <label for="pageSize">Kích thước trang:</label>
+                    <select id="pageSize">
+                        <option value="10" selected>10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>  
                 <button class="btn" id="searchBtn">Tìm kiếm</button>
             </div>
             <div class="info">
@@ -197,7 +250,7 @@
                     <!-- Dữ liệu sẽ được tải bằng JavaScript -->
                 </tbody>
             </table>
-            
+            <div id="pagination" class="pagination"></div>
         </div>
     </div>
 </body>

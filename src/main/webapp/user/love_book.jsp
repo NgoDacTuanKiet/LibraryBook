@@ -5,39 +5,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh sách yêu thích</title>
-    <link rel="stylesheet" href="/../CSS/header_style.css">
-    <link rel="stylesheet" href="/../CSS/list_book_style.css">
+    <link rel="stylesheet" href="/CSS/header_style.css">
+    <link rel="stylesheet" href="/CSS/list_book_style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
-            $.ajax({
-                url: "/api/favorite/list",
-                type: "GET",
-                dataType: "json",
-                success: function (data) {
-                    let bookList = $(".book-list");
-                    bookList.empty(); // Xóa dữ liệu cũ
+            let currentPage = 1;
 
-                    if (data.length === 0) {
-                        bookList.append("<p>Không có sách yêu thích nào.</p>");
-                    } else {
-                        $.each(data, function (index, book) {
-                   
-                            let bookHtml = 
-                                '<div class="book">' +
-                                    '<a href="book_detail?bookId=' + book.id + '">' + 
-                                        '<img src="' + book.imageUrl + '" alt="' + book.bookName + '">' +
-                                        '<p>' + book.bookName + '</p>' +
-                                    '</a>' +
-                                '</div>';
-                            bookList.append(bookHtml);
-                        });
+            loadBooks();
+
+            window.goToPage = function(page) {
+                currentPage = page;
+                loadBooks();
+            }
+
+            function loadBooks() {
+                $.ajax({
+                    url: "/api/favorite/list",
+                    type: "GET",
+                    data: {
+                        pageSize: 10,
+                        page: currentPage
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        let books = response.favoriteBooks;
+                        let bookList = $(".book-list");
+                        bookList.empty();
+
+                        if (books.length === 0) {
+                            bookList.append("<p>Không có sách yêu thích nào.</p>");
+                        } else {
+                            $.each(books, function (index, book) {
+                    
+                                let bookHtml = 
+                                    '<div class="book">' +
+                                        '<a href="book_detail?bookId=' + book.id + '">' + 
+                                            '<img src="' + book.imageUrl + '" alt="' + book.bookName + '">' +
+                                            '<p>' + book.bookName + '</p>' +
+                                        '</a>' +
+                                    '</div>';
+                                bookList.append(bookHtml);
+                            });
+                        }
+                        updatePagination(currentPage, response.totalPages);
+                    },
+                    error: function () {
+                        $(".book-list").html("<p>Không thể tải danh sách yêu thích.</p>");
                     }
-                },
-                error: function () {
-                    $(".book-list").html("<p>Không thể tải danh sách yêu thích.</p>");
+                });
+            }
+
+            function updatePagination(currentPage, totalPages) {
+                const pagination = $("#pagination");
+                pagination.empty();
+
+                const prevDisabled = currentPage <= 1 ? "disabled" : "";
+                pagination.append(
+                    "<button " + prevDisabled + " onclick=\"goToPage(" + (currentPage - 1) + ")\">&laquo;</button>"
+                );
+
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+
+                if (currentPage <= 3) {
+                    endPage = Math.min(5, totalPages);
                 }
-            });
+                if (currentPage >= totalPages - 2) {
+                    startPage = Math.max(1, totalPages - 4);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const active = i === currentPage ? "active" : "";
+                    pagination.append(
+                        "<button class=\"" + active + "\" onclick=\"goToPage(" + i + ")\">" + i + "</button>"
+                    );
+                }
+
+                const nextDisabled = currentPage >= totalPages ? "disabled" : "";
+                pagination.append(
+                    "<button " + nextDisabled + " onclick=\"goToPage(" + (currentPage + 1) + ")\">&raquo;</button>"
+                );
+            }
         });
     </script>    
 </head>
@@ -72,13 +121,7 @@
         <div class="book-list">
             
         </div>
-        <div class="pages">
-            <a href="#">1</a>
-            <a href="#">2</a>
-            <a href="#">3</a>
-            <a href="#">4</a>
-            <a href="#">5</a>
-        </div>
+        <div id="pagination" class="pagination"></div>
     </div>
 
 </body>

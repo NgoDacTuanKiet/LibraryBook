@@ -12,31 +12,79 @@
 
     <script>
         $(document).ready(function() {
-            $.ajax({
-                url: "/api/borrow/borrowed/book/list",
-                type: "GET",
-                success: function(response) {
-                    var books = response; 
-                    var bookListHtml = '';
-                    
-                    books.forEach(function(book) {
-                        var bookLink = $("<a>").attr("href", "book_detail?bookId=" + book.id);
+            let currentPage = 1;
 
-                        var bookDiv = $("<div>").addClass("book");
-                        var bookImg = $("<img>").attr("src", book.imageUrl).attr("alt", book.bookName);
-                        var bookName = $("<p>").text(book.bookName);
+            loadBooks();
 
-                        bookDiv.append(bookImg, bookName);
-                        bookLink.append(bookDiv);
+            window.goToPage = function(page) {
+                currentPage = page;
+                loadBooks();
+            }
 
-                        // Thêm liên kết vào danh sách sách
-                        $('.book-list').append(bookLink);
-                    });
-                },
-                error: function() {
-                    alert('Không thể tải dữ liệu sách');
+            function loadBooks() {
+                $.ajax({
+                    url: "/api/borrow/borrowed/book/list",
+                    type: "GET",
+                    data: {
+                        pageSize: 10,
+                        page: currentPage
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        var books = response.bookBorroweds; 
+                        var bookListHtml = '';
+                        
+                        books.forEach(function(book) {
+                            var bookLink = $("<a>").attr("href", "book_detail?bookId=" + book.id);
+
+                            var bookDiv = $("<div>").addClass("book");
+                            var bookImg = $("<img>").attr("src", book.imageUrl).attr("alt", book.bookName);
+                            var bookName = $("<p>").text(book.bookName);
+
+                            bookDiv.append(bookImg, bookName);
+                            bookLink.append(bookDiv);
+
+                            // Thêm liên kết vào danh sách sách
+                            $('.book-list').append(bookLink);
+                        });
+                        updatePagination(currentPage, response.totalPages);
+                    },
+                    error: function() {
+                        alert('Không thể tải dữ liệu sách');
+                    }
+                });
+            }
+            function updatePagination(currentPage, totalPages) {
+                const pagination = $("#pagination");
+                pagination.empty();
+
+                const prevDisabled = currentPage <= 1 ? "disabled" : "";
+                pagination.append(
+                    "<button " + prevDisabled + " onclick=\"goToPage(" + (currentPage - 1) + ")\">&laquo;</button>"
+                );
+
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+
+                if (currentPage <= 3) {
+                    endPage = Math.min(5, totalPages);
                 }
-            });
+                if (currentPage >= totalPages - 2) {
+                    startPage = Math.max(1, totalPages - 4);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const active = i === currentPage ? "active" : "";
+                    pagination.append(
+                        "<button class=\"" + active + "\" onclick=\"goToPage(" + i + ")\">" + i + "</button>"
+                    );
+                }
+
+                const nextDisabled = currentPage >= totalPages ? "disabled" : "";
+                pagination.append(
+                    "<button " + nextDisabled + " onclick=\"goToPage(" + (currentPage + 1) + ")\">&raquo;</button>"
+                );
+            }
         });
     </script>
 </head>
@@ -75,13 +123,7 @@
         <div class="book-list">
             
         </div>
-        <div class="pages">
-            <a href="#">1</a>
-            <a href="#">2</a>
-            <a href="#">3</a>
-            <a href="#">4</a>
-            <a href="#">5</a>
-        </div>
+        <div id="pagination" class="pagination"></div>
     </div>
 
 </body>

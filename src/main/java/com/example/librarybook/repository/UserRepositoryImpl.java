@@ -20,7 +20,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<User> findUserByRequest(String username, String fullName, String phoneNumber, String email, String role, Integer status){
+    public List<User> findUserByRequest(String username, String fullName, String phoneNumber, String email, String role, Integer status, Long offset, Long pageSize){
         StringBuilder sql = new StringBuilder("SELECT u.* FROM USERS as u");
 
         StringBuilder where = new StringBuilder(" WHERE 1=1 ");
@@ -28,9 +28,26 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
         where.append(" GROUP BY u.id, u.phoneNumber, u.role, u.email, u.username, u.address, u.fullName, u.imageURL, u.password, u.status");
         sql.append(where);
+        sql.append(" ORDER BY u.id DESC");
+        sql.append(" OFFSET ").append(offset).append(" ROWS FETCH NEXT ").append(pageSize).append(" ROWS ONLY");
         Query query = entityManager.createNativeQuery(sql.toString(), User.class);
         return query.getResultList();
     }
+
+    @Override
+    public Long findUserCountByRequest(String username, String fullName, String phoneNumber, String email, String role, Integer status) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM USERS as u");
+    
+        StringBuilder where = new StringBuilder(" WHERE 1=1 ");
+        queryNomal(username, fullName, phoneNumber, email, role, status, where);
+    
+        sql.append(where);
+    
+        Query query = entityManager.createNativeQuery(sql.toString());
+        Number countResult = (Number) query.getSingleResult();
+        return countResult.longValue();
+    }
+    
 
     private void queryNomal(String username, String fullName, String phoneNumber, String email, String role, Integer status , StringBuilder sql){
         if(username != null && !username.isEmpty()){
@@ -48,6 +65,6 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
         if(role != null && !role.isEmpty()){
             sql.append(" AND u.role = '").append(role).append("' ");
         }
-        sql.append("AND u.status = ").append(status);
+        sql.append(" AND u.status = ").append(status);
     }
 }

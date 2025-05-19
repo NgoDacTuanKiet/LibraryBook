@@ -7,6 +7,7 @@
     <title>Detail Book Rental Management</title>
     <link rel="stylesheet" href="/CSS/manage.css">
     <link rel="stylesheet" href="/CSS/header_style.css">
+    <link rel="stylesheet" href="/CSS/searchBox.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {

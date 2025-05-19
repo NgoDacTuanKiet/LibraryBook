@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,15 +45,25 @@ public class BookController {
     private CustomerService customerService;
     
     @GetMapping("/search")
-    public ResponseEntity<List<Book>> searchBooks(
+    public ResponseEntity<Map<String, Object>> searchBooks(
             @RequestParam(required = false) String bookName,
             @RequestParam(required = false) String publisher,
             @RequestParam(required = false) String author,
             @RequestParam(required = false) String yearOfpublication,
-            @RequestParam(required = false) List<Long> categories) {
-
-        List<Book> books = bookService.searchBooks(bookName, publisher, author, yearOfpublication, categories, 1);
-        return ResponseEntity.ok(books);
+            @RequestParam(required = false) List<Long> categories,
+            @RequestParam Long page,
+            @RequestParam Long pageSize) {
+        Long offset = (page-1)*pageSize;
+        Long totalBooks = bookService.findBookCountByRequest(bookName, publisher, author, yearOfpublication, categories, 1);
+        Long totalPages = totalBooks / pageSize;
+        if (totalPages * pageSize < totalBooks)
+            totalPages += 1;
+        List<Book> books = bookService.searchBooks(bookName, publisher, author, yearOfpublication, categories, 1, offset, pageSize);
+        Map<String, Object> result = new HashMap<>();
+        result.put("books", books);
+        result.put("totalBooks", totalBooks);
+        result.put("totalPages", totalPages);
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping(value = "/save", consumes = "multipart/form-data")

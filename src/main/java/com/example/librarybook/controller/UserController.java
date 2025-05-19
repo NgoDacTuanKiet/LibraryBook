@@ -12,15 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
@@ -65,13 +65,12 @@ public class UserController {
 
         // Tạo tài khoản mới
         User newUser = new User();
-        
         newUser.setUsername(user.getUsername());
         newUser.setPassword(user.getPassword());
-        newUser.setAddress(user.getAddress());
-        newUser.setFullName(user.getFullName());
-        newUser.setPhoneNumber(user.getPhoneNumber());
-        newUser.setEmail(user.getEmail());
+        newUser.setAddress(user.getAddress() == "" ? null : user.getAddress());
+        newUser.setFullName(user.getFullName() == "" ? null : user.getFullName());
+        newUser.setPhoneNumber(user.getPhoneNumber() == "" ? null : user.getPhoneNumber());
+        newUser.setEmail(user.getEmail() == "" ? null : user.getEmail());
         newUser.setStatus(1);
         
         String role = user.getRole();
@@ -126,15 +125,25 @@ public class UserController {
     }
     
     @GetMapping("/search")
-    public ResponseEntity<List<User>> searchUsers(
+    public ResponseEntity<Map<String, Object>> searchUsers(
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String fullName,
             @RequestParam(required = false) String phoneNumber,
             @RequestParam(required = false) String email,
-            @RequestParam(required = false) String role) {
-
-        List<User> users = userService.searchUser(username, fullName, phoneNumber, email, role, 1);
-        return ResponseEntity.ok(users);
+            @RequestParam(required = false) String role,
+            @RequestParam Long page,
+            @RequestParam Long pageSize) {
+        Long offset = (page-1)*pageSize;
+        Long totalAccount = userService.countUserByRequest(username, fullName, phoneNumber, email, role, 1);
+        Long totalPages = totalAccount / pageSize;
+        if (totalPages* pageSize < totalAccount) 
+            totalPages += 1;
+        List<User> users = userService.searchUser(username, fullName, phoneNumber, email, role, 1, offset, pageSize);
+        Map<String, Object> result = new HashMap<>();
+        result.put("users", users);
+        result.put("totalPages", totalPages);
+        result.put("totalAccount", totalAccount);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/information")
@@ -188,6 +197,29 @@ public class UserController {
         Map<String, String> response = new HashMap<>();
         response.put("message", "Xóa người dùng thành công!");
         return ResponseEntity.ok().body(response);
+    }
+    
+    @PostMapping(value = "/update-avatar", consumes = "multipart/form-data")
+    public String updateAvatar(@RequestParam("image") MultipartFile imageFile,
+                                HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        User user = userService.getUserById(currentUser.getId()).get();
+        if (!imageFile.isEmpty()) {
+            try {
+                String fileName = imageFile.getOriginalFilename();
+                String uploadDir = "src/main/resources/static/uploads/user/";
+                Path uploadPath = Paths.get(uploadDir);
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+                Files.copy(imageFile.getInputStream(), uploadPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+                user.setImageUrl("/uploads/user/" + fileName);
+            } catch (Exception e) {
+                
+            }
+        }
+        userService.saveUser(user);
+        return "";
     }
     
 }

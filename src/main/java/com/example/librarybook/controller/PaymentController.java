@@ -11,6 +11,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.librarybook.DTO.InvoiceResponseDTO;
@@ -129,9 +130,11 @@ public class PaymentController {
         return ResponseEntity.ok().body(paymentResponseDTOs);
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<List<InvoiceResponseDTO>> getPaymentList() {
-        List<Payment> payments = paymentService.getAllPayments();
+    @GetMapping("/search")
+    public ResponseEntity<List<InvoiceResponseDTO>> getPaymentList(@RequestParam(required = false) String customerFullName,
+                                                                   @RequestParam(required = false) String customerPhoneNumber,
+                                                                   @RequestParam(required = false) String employeeFullName) {
+        List<Payment> payments = paymentService.findPaymentByRequest(customerFullName, customerPhoneNumber, employeeFullName);
         List<InvoiceResponseDTO> invoiceResponseDTOs = new ArrayList<>();
         for(Payment i : payments){
             InvoiceResponseDTO tmp = new InvoiceResponseDTO(i.getId(), i.getPaymentDetails(), i.getCustomer().getUser(), i.getEmployee().getUser(), i.getTime());

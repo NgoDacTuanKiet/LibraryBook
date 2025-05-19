@@ -1,9 +1,11 @@
 .navbar {
-    /* position: fixed; */
+    position: fixed;
     background-color: green;
+    top: 0;
     padding: 20px;
     width: 100%;
     text-align: center;
+    z-index: 1000;
 }
 
 .navbar ul {

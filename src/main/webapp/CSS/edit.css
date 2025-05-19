@@ -39,13 +39,14 @@
     border-radius: 5px;
     width: 50%;
     height: auto;
-    margin-top: 50px;
-    margin-left: auto;
+    margin-top: 80px;
+    margin-left: 25%;
 }
 .form-group {
     margin-bottom: 10px;
     margin-right: 20px;
 }
+
 label {
     display: block;
     font-weight: bold;
@@ -101,4 +102,14 @@ input {
 .actionBtn {
     display: flex;
     gap: 10px;
+}
+
+.list-box {
+    margin-top: 80px;
+}
+
+.category-table th, .category-table td {
+    border: 1px solid black;
+    padding: 10px;
+    text-align: left;
 }

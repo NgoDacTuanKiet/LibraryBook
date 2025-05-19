@@ -49,6 +49,14 @@
                     <input type="text" id="searchPhone" placeholder="Số điện thoại">
                     <input type="text" id="searchEmail" placeholder="Email">
                 </div>
+                <div class="pagination-control">
+                    <label for="pageSize">Kích thước trang:</label>
+                    <select id="pageSize">
+                        <option value="10" selected>10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
                 <button class="btn" id="btnSearch">Tìm kiếm</button>  
             </div>
             <div class="info">
@@ -68,17 +76,25 @@
                     </tr>
                 </thead>
                 <tbody>
-
                 </tbody>
             </table>
+            <div id="pagination" class="pagination"></div>
         </div>
     </div>
 
     <script>
         $(document).ready(function () {
-            loadUsers(); // Gọi hàm tải sách khi trang vừa load
+            let currentPage = 1;
+
+            loadUsers();
+
+            window.goToPage = function(page) {
+                currentPage = page;
+                loadUsers();
+            }
 
             $("#btnSearch").click(function() {
+                currentPage = 1;
                 loadUsers();
             });
             
@@ -86,20 +102,24 @@
                 const fullName = $("#searchFullName").val();
                 const phoneNumber = $("#searchPhone").val();
                 const email = $("#searchEmail").val();
+                const pageSize = $("#pageSize").val();
 
                 let data = {};
                 if (fullName) data.fullName = fullName;
                 if (phoneNumber) data.phoneNumber = phoneNumber;
                 if (email) data.email = email;
+                data.pageSize = pageSize;
+                data.page = currentPage;
 
                 $.ajax({
                     url: "/api/user/search?role=EMPLOYEE",    
                     method: "GET",
                     data: data,
                     dataType: "json",
-                    success: function (users) {
+                    success: function (response) {
+                        users = response.users;
                         let tableBody = $(".table tbody");
-                        tableBody.empty(); // Xóa dữ liệu cũ trước khi cập nhật mới
+                        tableBody.empty();
 
                         if(users.length === 0){
                             tableBody.append("<p>").append("Không có tài khoản nào được tìm thấy!");
@@ -123,12 +143,45 @@
                             
                             tableBody.append(row);
                         });
+                        updatePagination(currentPage, response.totalPages);
                     },
                     error: function (xhr, status, error) {
                         console.error("Lỗi khi tải danh sách sách:", error);
                     }
                 });
             };
+
+            function updatePagination(currentPage, totalPages) {
+                const pagination = $("#pagination");
+                pagination.empty();
+
+                const prevDisabled = currentPage <= 1 ? "disabled" : "";
+                pagination.append(
+                    "<button " + prevDisabled + " onclick=\"goToPage(" + (currentPage - 1) + ")\">&laquo;</button>"
+                );
+
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+
+                if (currentPage <= 3) {
+                    endPage = Math.min(5, totalPages);
+                }
+                if (currentPage >= totalPages - 2) {
+                    startPage = Math.max(1, totalPages - 4);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const active = i === currentPage ? "active" : "";
+                    pagination.append(
+                        "<button class=\"" + active + "\" onclick=\"goToPage(" + i + ")\">" + i + "</button>"
+                    );
+                }
+
+                const nextDisabled = currentPage >= totalPages ? "disabled" : "";
+                pagination.append(
+                    "<button " + nextDisabled + " onclick=\"goToPage(" + (currentPage + 1) + ")\">&raquo;</button>"
+                );
+            }
 
             window.deleteUser = function (id) {
                 if (!confirm("Bạn có chắc muốn xóa tài khoản này?")) return;

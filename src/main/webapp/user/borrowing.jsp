@@ -13,63 +13,107 @@
 
     <script>
         $(document).ready(function () {
-        function getListBook() {
-            $.ajax({
-                url: "/api/borrow/borrowing/book/list",
-                type: "GET",
-                dataType: "json",
-                success: function(bookBorrowings) {
-                    renderBooks(bookBorrowings);
-                },
-                error: function (xhr, status, error) {
-                    console.error("Lỗi khi tải danh sách sách:", error);
-                }
-            });
-        }
+            let currentPage = 1;
 
-        function renderBooks(bookBorrowings) {
+            getListBook();
 
-            let bookList = $(".book-list");
-            bookList.empty();
-
-            if (!Array.isArray(bookBorrowings) || bookBorrowings.length === 0) {
-                bookList.append("<p>Không có sách nào đang mượn.</p>");
-                return;
+            window.goToPage = function(page) {
+                currentPage = page;
+                getListBook();
             }
-            bookBorrowings.forEach(function (bookBorrowing) {
-                let book = bookBorrowing.book;
 
-                let bookCard = $("<div>").addClass("book-card");
-                let formattedTime = formatDateTime(bookBorrowing.dueDate);
-                let bookImg = $("<img>")
-                    .attr("src", book.imageUrl)
-                    .attr("alt", book.bookName);
+            function getListBook() {
+                $.ajax({
+                    url: "/api/borrow/borrowing/book/list",
+                    type: "GET",
+                    data: {
+                        pageSize: 10,
+                        page: currentPage
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        renderBooks(response.bookBorrowings);
+                        updatePagination(currentPage, response.totalPages);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Lỗi khi tải danh sách sách:", error);
+                    }
+                });
+            }
 
-                let bookInfo = $("<div>").addClass("book-info");
-                
-                let bookName = $("<p>").html("<strong>Tên : </strong>" + book.bookName);
-                let bookAuthor = $("<p>").html("<strong>Tác giả : </strong>" + book.author);
-                let bookPublisher = $("<p>").html("<strong>Nhà xuất bản : </strong>" + book.publisher);
-                let bookYearOfpublication = $("<p>").html("<strong>Năm xuất bản : </strong>" + book.yearOfpublication);
-                let bookBorrowingQuantity = $("<p>").html("<strong>Số lượng : </strong>" + bookBorrowing.quantity);
-                let bookBorrowingDueDate = $("<p>").html("<strong>Hạn : </strong>" + formattedTime);
+            function renderBooks(bookBorrowings) {
 
-                bookInfo.append(bookName, bookAuthor, bookPublisher, bookBorrowingQuantity, bookBorrowingDueDate);
-                bookCard.append(bookImg, bookInfo);
+                let bookList = $(".book-list");
+                bookList.empty();
 
-                bookList.append(bookCard);
-            });
-        }
+                if (!Array.isArray(bookBorrowings) || bookBorrowings.length === 0) {
+                    bookList.append("<p>Không có sách nào đang mượn.</p>");
+                    return;
+                }
+                bookBorrowings.forEach(function (bookBorrowing) {
+                    let book = bookBorrowing.book;
 
-        function formatDateTime(isoString) {
-            let date = new Date(isoString);
-            return date.toLocaleString("vi-VN", { 
-                day: '2-digit', month: '2-digit', year: 'numeric'
-            });
-        }
+                    let bookCard = $("<div>").addClass("book-card");
+                    let formattedTime = formatDateTime(bookBorrowing.dueDate);
+                    let bookImg = $("<img>")
+                        .attr("src", book.imageUrl)
+                        .attr("alt", book.bookName);
 
-        getListBook();
-    });
+                    let bookInfo = $("<div>").addClass("book-info");
+                    
+                    let bookName = $("<p>").html("<strong>Tên : </strong>" + book.bookName);
+                    let bookAuthor = $("<p>").html("<strong>Tác giả : </strong>" + book.author);
+                    let bookPublisher = $("<p>").html("<strong>Nhà xuất bản : </strong>" + book.publisher);
+                    let bookYearOfpublication = $("<p>").html("<strong>Năm xuất bản : </strong>" + book.yearOfpublication);
+                    let bookBorrowingQuantity = $("<p>").html("<strong>Số lượng : </strong>" + bookBorrowing.quantity);
+                    let bookBorrowingDueDate = $("<p>").html("<strong>Hạn : </strong>" + formattedTime);
+
+                    bookInfo.append(bookName, bookAuthor, bookPublisher, bookBorrowingQuantity, bookBorrowingDueDate);
+                    bookCard.append(bookImg, bookInfo);
+
+                    bookList.append(bookCard);
+                });
+            }
+
+            function formatDateTime(isoString) {
+                let date = new Date(isoString);
+                return date.toLocaleString("vi-VN", { 
+                    day: '2-digit', month: '2-digit', year: 'numeric'
+                });
+            }
+
+            function updatePagination(currentPage, totalPages) {
+                const pagination = $("#pagination");
+                pagination.empty();
+
+                const prevDisabled = currentPage <= 1 ? "disabled" : "";
+                pagination.append(
+                    "<button " + prevDisabled + " onclick=\"goToPage(" + (currentPage - 1) + ")\">&laquo;</button>"
+                );
+
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+
+                if (currentPage <= 3) {
+                    endPage = Math.min(5, totalPages);
+                }
+                if (currentPage >= totalPages - 2) {
+                    startPage = Math.max(1, totalPages - 4);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const active = i === currentPage ? "active" : "";
+                    pagination.append(
+                        "<button class=\"" + active + "\" onclick=\"goToPage(" + i + ")\">" + i + "</button>"
+                    );
+                }
+
+                const nextDisabled = currentPage >= totalPages ? "disabled" : "";
+                pagination.append(
+                    "<button " + nextDisabled + " onclick=\"goToPage(" + (currentPage + 1) + ")\">&raquo;</button>"
+                );
+            }
+        });
     </script>
 </head>
 <body>
@@ -106,6 +150,7 @@
                 
             </div>
         </div>
+        <div id="pagination" class="pagination"></div>
     </div>
 </body>
 </html>

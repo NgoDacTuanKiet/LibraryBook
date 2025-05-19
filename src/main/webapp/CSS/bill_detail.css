@@ -1,6 +1,7 @@
 .content {
     width: 80%;
     margin: 20px auto;
+    margin-top: 180px;
     padding: 20px;
     background-color: white;
     border-radius: 8px;
@@ -67,23 +68,13 @@ h2 {
 }
 
 @media print {
-    /* Ẩn header */
-    .navbar {
-        display: none;
-    }
-
-    .sidebar {
-        display: none;
-    }
-
-    /* Ẩn nút in */
-    .btn-print {
-        display: none;
-    }
-
-    /* Ẩn các phần không cần thiết khác nếu có */
+    .navbar,
+    .sidebar,
+    .sidebar *,
+    .btn-print,
     .container .btn-back {
-        display: none;
+        display: none !important;
+        visibility: hidden !important;
     }
 }
 
@@ -129,4 +120,12 @@ h2 {
     min-width: 140px;
     font-weight: 600;
     color: #333;
+}
+
+.but {
+    display: flex;
+    justify-content: center;
+    align-items: first baseline;
+    gap: 10px; 
+    margin-top: 20px; /* Tùy chỉnh khoảng cách phía trên nếu cần */
 }

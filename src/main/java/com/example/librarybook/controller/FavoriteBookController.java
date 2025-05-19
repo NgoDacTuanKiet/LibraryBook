@@ -1,11 +1,15 @@
 package com.example.librarybook.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.librarybook.model.Book;
@@ -50,11 +54,28 @@ public class FavoriteBookController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<Book>> listFavoriteBook(HttpSession session) {
+    public ResponseEntity<Map<String, Object>> listFavoriteBook(HttpSession session,
+                                                        @RequestParam Long page,
+                                                        @RequestParam Long pageSize) {
         User user = (User) session.getAttribute("user");
         Customer customer = customerService.getCustomerByUserId(user.getId());
-        List<Book> favoritesBooks = customer.getFavoriteBooks();
-        return ResponseEntity.ok(favoritesBooks);
+        List<Book> books = customer.getFavoriteBooks();
+        Long totalBooks = books.size()*1L;
+        Long totalPages = totalBooks / pageSize;
+        if (totalPages * pageSize < totalBooks)
+            totalPages += 1;
+        Long start = (page-1) * pageSize;
+        Long end = start + pageSize - 1;
+        if (end > totalBooks - 1)
+            end = totalBooks - 1;
+        List<Book> favoritesBooks = new ArrayList<>();
+        for(Long i = start; i <= end; i++){
+            favoritesBooks.add(books.get(i.intValue()));
+        }
+        Map<String, Object> result = new HashMap<>();
+        result.put("favoriteBooks", favoritesBooks);
+        result.put("totalPages", totalPages);
+        return ResponseEntity.ok(result);
     }
     
 }

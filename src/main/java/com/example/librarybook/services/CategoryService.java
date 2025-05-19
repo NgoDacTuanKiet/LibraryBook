@@ -3,6 +3,7 @@ package com.example.librarybook.services;
 import com.example.librarybook.model.Category;
 import com.example.librarybook.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,8 +15,12 @@ public class CategoryService {
     private CategoryRepository categoryRepository;
 
     // Lấy tất cả thể loại
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public List<Category> getAllCategoriesPageable(Pageable pageable) {
+        return categoryRepository.findAll(pageable).getContent();
+    }
+
+    public Long getNumberOfCategory(){
+        return categoryRepository.findAll().size()*1L;
     }
 
     // Lấy thể loại theo ID
