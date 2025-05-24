@@ -16,7 +16,9 @@ import com.example.librarybook.services.UserService;
 import jakarta.servlet.http.HttpSession;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -65,10 +67,35 @@ public class CommentController {
     public ResponseEntity<CommentResponseDTO> getComment(@PathVariable Long bookId, HttpSession session) {
         Book book = bookService.getBookByID(bookId);
         List<Comment> comments = book.getComments();
-        User tmp = (User) session.getAttribute("user");
-        User currentUser = userService.getUserById(tmp.getId()).get();
+
+        User currentUser = null;
+        if (session != null){
+            User tmp = (User) session.getAttribute("user");
+            if (tmp != null){
+                currentUser = userService.getUserById(tmp.getId()).get();
+            }
+        }
+
         CommentResponseDTO responseDTO = new CommentResponseDTO(currentUser, comments);
         return ResponseEntity.ok(responseDTO);
+    }
+    
+    @PostMapping("/edit")
+    public ResponseEntity<Map<String, Object>> editComment(@RequestBody Comment newComment) {
+        Comment oldComment = commentService.findCommentById(newComment.getId());
+        oldComment.setContent(newComment.getContent());
+        commentService.saveComment(oldComment);
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Đã sửa bình luận!");
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<Map<String, Object>> deleteComment(@RequestBody Comment comment) {
+        commentService.deleteComment(comment.getId());
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Đã xóa bình luận!");
+        return ResponseEntity.ok().body(response);
     }
     
 }

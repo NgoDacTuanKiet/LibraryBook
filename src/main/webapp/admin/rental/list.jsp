@@ -53,7 +53,6 @@
                                 "<tr>" +
                                     "<td>" + user.id + "</td>" +
                                     "<td>" + user.username + "</td>" +
-                                    "<td>" + user.password + "</td>" +
                                     "<td>" + user.fullName + "</td>" +
                                     "<td>" + user.phoneNumber + "</td>" +
                                     "<td>" + user.email + "</td>" +
@@ -153,7 +152,6 @@
                     <tr>
                         <th>Mã khách hàng</th>
                         <th>Tài khoản</th>
-                        <th>Mật khẩu</th>
                         <th>Tên khách hàng</th>
                         <th>Số điện thoại</th>
                         <th>Email</th>

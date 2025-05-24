@@ -12,6 +12,21 @@
 
     <script>
         $(document).ready(function() {
+            const avatar = document.getElementById('avatar');
+            const imageInput = document.getElementById('imageInput');
+
+            avatar.addEventListener('click', () => {
+                imageInput.click();
+            });
+
+            imageInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const imageURL = URL.createObjectURL(file);
+                    avatar.src = imageURL;
+                }
+            });
+
             loadInformation();
 
             function loadInformation(){
@@ -78,44 +93,6 @@
                 });
             });
 
-            $("#avatarInput").change(function () {
-                let file = this.files[0];
-                if (!file) return;
-
-                let formData = new FormData();
-                formData.append("avatar", file);
-
-                $.ajax({
-                    url: "/api/user/upload-avatar",  // API phía backend cần tạo
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    xhrFields: { withCredentials: true },
-                    success: function (response) {
-                        alert("Cập nhật ảnh đại diện thành công!");
-                        loadInformation(); // Tải lại ảnh mới
-                    },
-                    error: function (xhr) {
-                        console.error("Lỗi cập nhật ảnh:", xhr.responseText);
-                        alert("Cập nhật ảnh đại diện thất bại!");
-                    }
-                });
-            });
-
-            // Xem trước ảnh khi chọn
-            $("input[name='image']").change(function () {
-                const file = this.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        $(".avatar-preview").attr("src", e.target.result).show();
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            // Gửi ảnh lên server
             $("#updateAvatarBtn").click(function (e) {
                 e.preventDefault();
                 
@@ -128,11 +105,12 @@
                     contentType: false,
                     processData: false,
                     success: function (response) {
-                        alert("Cập nhật ảnh thành công!");
-                        // Cập nhật ảnh hiển thị nếu có
                         if (response.imageUrl) {
-                            $(".avatar-preview").attr("src", response.imageUrl);
+                            $(".avatar").attr("src", response.imageUrl);
                         }
+                        loadInformation();
+                        alert("Cập nhật ảnh thành công!");
+                        
                     },
                     error: function () {
                         alert("Lỗi khi cập nhật ảnh!");
@@ -166,12 +144,10 @@
     <div class="profile-container">
         <div class="profile-card">
             <!-- <img alt="Avatar" class="avatar"> -->
-             <form id="avatarForm" enctype="multipart/form-data">
+            <form id="avatarForm" enctype="multipart/form-data">
                 <div class="form-group">
-                    <label for="image">Ảnh đại diện</label>
-                    <img class="avatar-preview" src="#" alt="Ảnh hiện tại" style="display:none; margin-top:10px; max-width: 200px;" />
-                    <input type="hidden" name="currentImageUrl" value="">
-                    <input type="file" name="image" accept="image/*" required>
+                    <img class="avatar" id="avatar" alt="Avatar"/>
+                    <input type="file" name="image" id="imageInput" accept="image/*" required style="display: none;">
                 </div>
                 <button type="button" id="updateAvatarBtn" class="btn btn-add">Cập nhật ảnh</button>
             </form>

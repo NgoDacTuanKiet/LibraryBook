@@ -39,14 +39,14 @@ public class BookRepositoryImpl implements BookRepositoryCustom {
 
     @Override
     public Long findBookCountByRequest(String bookName, String publisher, String author, String yearOfpublication, List<Long> categories, Integer status) {
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*)");
-        selectSQL(categories, sql);
+        StringBuilder sql = new StringBuilder("SELECT COUNT(DISTINCT b.id)");
         sql.append(" FROM Book as b ");
         joinTable(categories, sql);
 
         StringBuilder where = new StringBuilder(" WHERE 1=1 ");
         queryNomal(bookName, publisher, author, yearOfpublication, status, where);
         querySpecial(categories, where);
+        sql.append(where);
 
         Query query = entityManager.createNativeQuery(sql.toString());
         Number countResult = (Number) query.getSingleResult();

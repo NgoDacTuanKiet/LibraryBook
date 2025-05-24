@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -131,16 +133,31 @@ public class PaymentController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<InvoiceResponseDTO>> getPaymentList(@RequestParam(required = false) String customerFullName,
+    public ResponseEntity<Map<String, Object>> getPaymentList(@RequestParam(required = false) String customerFullName,
                                                                    @RequestParam(required = false) String customerPhoneNumber,
-                                                                   @RequestParam(required = false) String employeeFullName) {
-        List<Payment> payments = paymentService.findPaymentByRequest(customerFullName, customerPhoneNumber, employeeFullName);
+                                                                   @RequestParam(required = false) String employeeFullName,
+                                                                   @RequestParam Long page,
+                                                                   @RequestParam Long pageSize) {
+        Pageable pageable = PageRequest.of(page.intValue() - 1, pageSize.intValue());
+        List<Payment> payments = paymentService.findPaymentByRequest(customerFullName, customerPhoneNumber, employeeFullName, pageable);
+        Long totalPayment = paymentService.findNumberPaymentByRequest(customerFullName, customerPhoneNumber, employeeFullName, pageable);
+        Long totalPages = totalPayment / pageSize;
+        if (totalPages * pageSize < totalPayment)
+            totalPages += 1;
+        Long start = (page-1) * pageSize;
+        Long end = start + pageSize - 1;
+        if (end > totalPayment - 1)
+            end = totalPayment - 1;
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalPages", totalPages);
         List<InvoiceResponseDTO> invoiceResponseDTOs = new ArrayList<>();
-        for(Payment i : payments){
-            InvoiceResponseDTO tmp = new InvoiceResponseDTO(i.getId(), i.getPaymentDetails(), i.getCustomer().getUser(), i.getEmployee().getUser(), i.getTime());
+        for(Long i = start; i <= end; i++){
+            Payment paymentTMP = payments.get(i.intValue());
+            InvoiceResponseDTO tmp = new InvoiceResponseDTO(paymentTMP.getId(), paymentTMP.getPaymentDetails(), paymentTMP.getCustomer().getUser(), paymentTMP.getEmployee().getUser(), paymentTMP.getTime());
             invoiceResponseDTOs.add(tmp);
         }
-        return ResponseEntity.ok().body(invoiceResponseDTOs);
+        response.put("invoiceResponseDTOs", invoiceResponseDTOs);
+        return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/detail/{paymentId}")

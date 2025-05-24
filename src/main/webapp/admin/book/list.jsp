@@ -123,7 +123,7 @@
             }
 
             window.deleteBook = function (id) {
-                if (!confirm("Bạn có chắc muốn xóa sách này?")) return;
+                if (!confirm("Bạn có chắc muốn xóa sách id = " + id + " ?")) return;
 
                 $.ajax({
                     url: "/api/book/delete/" + id,
@@ -138,7 +138,7 @@
             };
 
             $.ajax({
-                url: "/api/categories",
+                url: "/api/categories/getCategories",
                 type: "GET",
                 success: function(categories) {
                     let categorySelect = $("#categories-container");

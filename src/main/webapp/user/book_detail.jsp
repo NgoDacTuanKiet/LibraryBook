@@ -124,6 +124,74 @@
             $(document).on("click", function () {
                 $(".action-menu").hide();
             });
+
+            let editingCommentId = null;
+
+            // Mở modal khi nhấn nút "Sửa"
+            $(document).on("click", ".edit-comment", function () {
+                const commentItem = $(this).closest(".comment-item");
+                editingCommentId = commentItem.data("id");
+                const content = commentItem.find("p").eq(1).text();
+
+                $("#editCommentContent").val(content);
+                $("#editCommentModal").show();
+            });
+
+            // Đóng modal
+            $(".close").click(function () {
+                $("#editCommentModal").hide();
+                editingCommentId = null;
+            });
+
+            $(window).click(function (event) {
+                if (event.target.id === "editCommentModal") {
+                    $("#editCommentModal").hide();
+                    editingCommentId = null;
+                }
+            });
+
+            // Lưu chỉnh sửa
+            $("#saveEditedComment").click(function () {
+                const newContent = $("#editCommentContent").val().trim();
+                if (newContent && editingCommentId) {
+                    $.ajax({
+                        url: "/api/comment/edit",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({ id: editingCommentId, content: newContent }),
+                        success: function () {
+                            $("#editCommentModal").hide();
+                            editingCommentId = null;
+                            loadComments(bookId); // load lại danh sách
+                        },
+                        error: function () {
+                            alert("Lỗi khi chỉnh sửa bình luận!");
+                        }
+                    });
+                }
+            });
+
+            // Xóa bình luận
+            $(document).on("click", ".delete-comment", function () {
+                const commentItem = $(this).closest(".comment-item");
+                const commentId = commentItem.data("id");
+
+                if (confirm("Bạn có chắc chắn muốn xóa bình luận này?")) {
+                    $.ajax({
+                        url: "/api/comment/delete",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({ id: commentId }),
+                        success: function () {
+                            loadComments(bookId);
+                        },
+                        error: function () {
+                            alert("Lỗi khi xóa bình luận!");
+                        }
+                    });
+                }
+            });
+
         });
 
         function formatDateTime(isoString) {
@@ -151,7 +219,7 @@
                             '<p><strong>' + comment.username + '</strong> - ' + formattedTime + '</p>' +
                             '<p>' + comment.content + '</p>';
 
-                        if (commentDTO.user.username === comment.username){
+                        if (commentDTO.user && commentDTO.user.username === comment.username){
                             html += 
                                 '<button class="comment-action">⋮</button>' +
                                 '<div class="action-menu">' +
@@ -259,6 +327,13 @@
         
         
     </div>
-
+    <div id="editCommentModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Sửa bình luận</h3>
+            <textarea id="editCommentContent" placeholder="Nhập nội dung mới..."></textarea>
+            <button id="saveEditedComment">Lưu</button>
+        </div>
+    </div>
 </body>
 </html>

@@ -68,7 +68,6 @@
                     <tr>
                         <th>Mã nhân viên</th>
                         <th>Tài khoản</th>
-                        <th>Mật khẩu</th>
                         <th>Tên khách hàng</th>
                         <th>Số điện thoại</th>
                         <th>Email</th>
@@ -131,7 +130,6 @@
                                 "<tr>" +
                                     "<td>" + user.id + "</td>" +
                                     "<td>" + user.username + "</td>" +
-                                    "<td>" + user.password + "</td>" +
                                     "<td>" + user.fullName + "</td>" +
                                     "<td>" + user.phoneNumber + "</td>" +
                                     "<td>" + user.email + "</td>" +
@@ -184,7 +182,7 @@
             }
 
             window.deleteUser = function (id) {
-                if (!confirm("Bạn có chắc muốn xóa tài khoản này?")) return;
+                if (!confirm("Bạn có chắc muốn xóa nhân viên id = " + id + " ?")) return;
 
                 $.ajax({
                     url: "/api/user/delete/" + id,

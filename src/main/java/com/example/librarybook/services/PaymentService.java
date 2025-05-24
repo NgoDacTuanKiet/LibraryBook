@@ -3,6 +3,7 @@ package com.example.librarybook.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.librarybook.model.Payment;
@@ -25,7 +26,11 @@ public class PaymentService {
         return paymentRepository.findById(id).get();
     }
 
-    public List<Payment> findPaymentByRequest(String customerFullName, String customerPhoneNumber, String emplyeeFullName){
-        return paymentRepository.findPaymentByRequest(customerFullName, customerPhoneNumber, emplyeeFullName);
+    public List<Payment> findPaymentByRequest(String customerFullName, String customerPhoneNumber, String employeeFullName, Pageable pageable){
+        return paymentRepository.findPaymentByRequest(customerFullName, customerPhoneNumber, employeeFullName, pageable).getContent();
+    }
+
+    public Long findNumberPaymentByRequest(String customerFullName, String customerPhoneNumber, String employeeFullName, Pageable pageable){
+        return paymentRepository.findPaymentByRequest(customerFullName, customerPhoneNumber, employeeFullName, pageable).getTotalElements();
     }
 }

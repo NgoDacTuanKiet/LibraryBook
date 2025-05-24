@@ -114,7 +114,7 @@
             });
 
             $.ajax({
-                url: "/api/categories",
+                url: "/api/categories/getCategories",
                 type: "GET",
                 success: function(categories) {
                     let categorySelect = $("#categories-container");

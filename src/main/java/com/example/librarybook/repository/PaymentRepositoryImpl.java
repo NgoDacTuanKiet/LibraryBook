@@ -2,6 +2,9 @@ package com.example.librarybook.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,15 +22,16 @@ public class PaymentRepositoryImpl implements PaymentReopsitoryCustom{
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Payment> findPaymentByRequest(String customerFullName, String employeeFullName, String customerPhoneNumber){
-        StringBuilder sql = new StringBuilder(" SELECT p.* " +
+    public Page<Payment> findPaymentByRequest(String customerFullName, String customerPhoneNumber, String employeeFullName, Pageable pageable){
+        StringBuilder sql = new StringBuilder(" SELECT DISTINCT p.* " +
                                               " From Payment as p ");
         joinTable(customerFullName, customerPhoneNumber, employeeFullName, sql);
 
         sql.append(" WHERE 1=1 ");
         querySpecial(customerFullName, customerPhoneNumber, employeeFullName, sql);
         Query query = entityManager.createNativeQuery(sql.toString(), Payment.class);
-        return query.getResultList();
+        List<Payment> payments = query.getResultList();
+        return new PageImpl<>(payments, pageable, payments.size());
     }
 
     private void joinTable(String customerFullName, String customerPhoneNumber, String employeeFullName, StringBuilder sql){

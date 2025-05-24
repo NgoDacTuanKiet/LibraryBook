@@ -13,10 +13,17 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
+            let currentPage = 1;
+
             loadPayments();
+
+            window.goToPage = function(page) {
+                currentPage = page;
+                loadPayments();
+            }
             
             $("#searchBtn").click(function() {
-                loadBooks();
+                loadPayments();
             });
 
             function loadPayments(){
@@ -30,10 +37,13 @@
                     data: {
                         customerFullName: customerFullName,
                         customerPhoneNumber: customerPhoneNumber,
-                        employeeFullName: employeeFullName
+                        employeeFullName: employeeFullName,
+                        pageSize: 10,
+                        page: currentPage
                     },
                     dataType: "json",
-                    success: function (invoiceResponseDTOs) {
+                    success: function (response) {
+                        let invoiceResponseDTOs = response.invoiceResponseDTOs;
                         let billTableBody = $(".bill-table tbody");
                         billTableBody.empty();
 
@@ -56,6 +66,7 @@
 
                             billTableBody.append(row);
                         });
+                        updatePagination(currentPage, response.totalPages);
                     },
                     error: function () {
                         alert("Lỗi khi tải danh sách hóa đơn.");
@@ -69,6 +80,38 @@
             return date.toLocaleString("vi-VN", { 
                 day: '2-digit', month: '2-digit', year: 'numeric'
             });
+        }
+
+        function updatePagination(currentPage, totalPages) {
+            const pagination = $("#pagination");
+            pagination.empty();
+
+            const prevDisabled = currentPage <= 1 ? "disabled" : "";
+            pagination.append(
+                "<button " + prevDisabled + " onclick=\"goToPage(" + (currentPage - 1) + ")\">&laquo;</button>"
+            );
+
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, currentPage + 2);
+
+            if (currentPage <= 3) {
+                endPage = Math.min(5, totalPages);
+            }
+            if (currentPage >= totalPages - 2) {
+                startPage = Math.max(1, totalPages - 4);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const active = i === currentPage ? "active" : "";
+                pagination.append(
+                    "<button class=\"" + active + "\" onclick=\"goToPage(" + i + ")\">" + i + "</button>"
+                );
+            }
+
+            const nextDisabled = currentPage >= totalPages ? "disabled" : "";
+            pagination.append(
+                "<button " + nextDisabled + " onclick=\"goToPage(" + (currentPage + 1) + ")\">&raquo;</button>"
+            );
         }
     </script>
 </head>
@@ -126,7 +169,8 @@
                 <tbody>
                     <!-- Dữ liệu sẽ được thêm vào đây bằng JS -->
                 </tbody>
-            </table>            
+            </table>
+            <div id="pagination" class="pagination"></div>            
         </div>
     </div>
 

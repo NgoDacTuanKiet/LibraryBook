@@ -56,7 +56,7 @@ public class Book {
     @ManyToMany(mappedBy = "bookBorroweds", fetch = FetchType.LAZY)
     private List<Customer> borrowedByCustomers = new ArrayList<>();
     
-    @ManyToMany(mappedBy = "booksOfCategory",cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "booksOfCategory", fetch = FetchType.LAZY)
     private List<Category> categoriesOfBook = new ArrayList<>();
     
     @JsonIgnore

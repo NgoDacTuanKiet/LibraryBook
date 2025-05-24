@@ -1,9 +1,10 @@
 package com.example.librarybook.repository;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.example.librarybook.model.Payment;
 
 public interface PaymentReopsitoryCustom {
-    List<Payment> findPaymentByRequest(String customerFullName, String customerPhoneNumber, String employeeFullName);
+    Page<Payment> findPaymentByRequest(String customerFullName, String customerPhoneNumber, String employeeFullName, Pageable pageable);
 }

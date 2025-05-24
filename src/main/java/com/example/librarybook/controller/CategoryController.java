@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/api/categories")
@@ -30,15 +33,17 @@ public class CategoryController {
         Long totalPages = totalCategory / pageSize;
         if (totalPages * pageSize < totalCategory)
             totalPages += 1;
-        Long start = (page-1) * pageSize;
-        Long end = start + pageSize - 1;
-        if (end > totalCategory - 1)
-            end = totalCategory - 1;
         Map<String, Object> response = new HashMap<>();
         response.put("categories", categories);
         response.put("totalPages", totalPages);
         return response;
     }
+
+    @GetMapping("/getCategories")
+    public List<Category> getCategories() {
+        return categoryService.getAllCategories();
+    }
+    
 
     // Lấy thể loại theo ID
     @GetMapping("/{id}")
@@ -51,12 +56,20 @@ public class CategoryController {
     @PostMapping("/save")
     public ResponseEntity<Map<String, String>> saveCategory(@RequestBody Category category) {
         Map<String, String> response = new HashMap<>();
-        if(categoryService.findCategoryByName(category.getName()) != null){
-            response.put("message", "Thể loại đã tồn tại!");
-            return ResponseEntity.badRequest().body(response);
+        if(category.getId() == null){
+            if(categoryService.findCategoryByName(category.getName()) != null){
+                response.put("message", "Thể loại đã tồn tại!");
+                return ResponseEntity.badRequest().body(response);
+            }
+            categoryService.saveCategory(category);
+            response.put("message", "Thêm thể loại thành công");
+        } else {
+            Category category2 = categoryService.getCategoryById(category.getId()).get();
+            category2.setName(category.getName());
+            categoryService.saveCategory(category2);
+            response.put("message", "Sửa thể loại thành công");
         }
-        categoryService.saveCategory(category);
-        response.put("message", "Thêm thể loại thành công");
+        
         return ResponseEntity.ok().body(response);
     }
 

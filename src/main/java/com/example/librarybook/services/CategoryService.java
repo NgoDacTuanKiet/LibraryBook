@@ -19,6 +19,10 @@ public class CategoryService {
         return categoryRepository.findAll(pageable).getContent();
     }
 
+    public List<Category> getAllCategories(){
+        return categoryRepository.findAll();
+    }
+
     public Long getNumberOfCategory(){
         return categoryRepository.findAll().size()*1L;
     }
