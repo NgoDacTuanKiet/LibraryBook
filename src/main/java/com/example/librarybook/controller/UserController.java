@@ -23,12 +23,19 @@ import java.util.List;
 import java.util.Map;
 
 
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
 
     @Autowired
     private UserService userService;
+    
+    @GetMapping()
+    public User getUserSession(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        return user;
+    }
     
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> signin(@RequestBody User user, HttpSession session) {
